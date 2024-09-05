@@ -4,7 +4,6 @@ import java.util.Random;
 
 import net.mcft.copy.limitedspawners.LimitedSpawners;
 import net.mcft.copy.limitedspawners.config.ConfigValues;
-import net.mcft.copy.limitedspawners.item.SpawnerKeyItem;
 import net.mcft.copy.limitedspawners.networking.LimitedSpawnersPacketHandler;
 import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerConfig;
 import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerEggDrop;
@@ -62,14 +61,8 @@ public class SpawnerEventHandler {
 
 		LimitedSpawnersPacketHandler.INSTANCE.sendTo(
 				new SyncSpawnerConfig(
-						ConfigValues.get("disable_spawner_config"),
-						ConfigValues.get("disable_count"),
-						ConfigValues.get("disable_speed"),
-						ConfigValues.get("disable_range"),
 						ConfigValues.get("limited_spawns_enabled"),
-						ConfigValues.get("limited_spawns_amount"),
-						ConfigValues.get("default_spawner_range_enabled"),
-						ConfigValues.get("default_spawner_range")),
+						ConfigValues.get("limited_spawns_amount")),
 				player.connection.connection,
 				NetworkDirection.PLAY_TO_CLIENT);
 	}
@@ -240,13 +233,12 @@ public class SpawnerEventHandler {
 	 * 	Enables so that the player can right click a spawner to get its egg.
 	 */
 	@SubscribeEvent
-	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {   
+	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
 		Item item = event.getItemStack().getItem();
 		
 		// Leave if we are client and if we are holding a block. Also prevent off hand action
-		if(item instanceof BlockItem || 
-				item instanceof SpawnEggItem || 
-				item instanceof SpawnerKeyItem || 
+		if(item instanceof BlockItem ||
+				item instanceof SpawnEggItem ||
 				event.getHand() == InteractionHand.OFF_HAND)
 			return;
 
@@ -262,15 +254,15 @@ public class SpawnerEventHandler {
 		if(level.getBlockState(blockpos).getBlock() != Blocks.SPAWNER)
 			return;
 		
-    	// Leave if item is part of the item id blacklist
-    	String registryName = ForgeRegistries.ITEMS.getKey(item).toString();
-    			
-    	if(ConfigValues.get("display_item_id_from_right_click_in_log") == 1)
+		// Leave if item is part of the item id blacklist
+		String registryName = ForgeRegistries.ITEMS.getKey(item).toString();
+				
+		if(ConfigValues.get("display_item_id_from_right_click_in_log") == 1)
 			LimitedSpawners.LOGGER.info("Right clicked with item id: " + registryName);
-    	
-    	if(ConfigValues.isItemIdBlacklisted(registryName))
-    		return;
-    	
+		
+		if(ConfigValues.isItemIdBlacklisted(registryName))
+			return;
+		
 		// Send Network message
 		LimitedSpawnersPacketHandler.INSTANCE.sendToServer(new SyncSpawnerEggDrop(blockpos));
 	}

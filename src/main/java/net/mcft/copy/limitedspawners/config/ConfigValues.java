@@ -27,19 +27,10 @@ public class ConfigValues {
 	public static void setDefaultConfigValues() {
 		CONFIG_SPEC.put("monster_egg_drop_chance", 4);
 		CONFIG_SPEC.put("disable_silk_touch", 0);
-		CONFIG_SPEC.put("disable_spawner_config", 0);
-		CONFIG_SPEC.put("disable_count", 0);
-		CONFIG_SPEC.put("disable_range", 0);
-		CONFIG_SPEC.put("disable_speed", 0);
 		CONFIG_SPEC.put("limited_spawns_enabled", 0);
 		CONFIG_SPEC.put("limited_spawns_amount", 32);
 		CONFIG_SPEC.put("disable_egg_removal_from_spawner", 0);
 		CONFIG_SPEC.put("monster_egg_only_drop_when_killed_by_player", 0);
-		
-		// Set custom range on all spawners (mc default is 16)
-		CONFIG_SPEC.put("default_spawner_range_enabled", 0);
-		CONFIG_SPEC.put("default_spawner_range", 52);
-		
 		CONFIG_SPEC.put("spawner_hardness", 5);
 		
 		// Loop through item registry and insert all spawn egg entities to hash map.
@@ -135,15 +126,9 @@ public class ConfigValues {
 	/**
 	 * 	Sync the server config with client when player joins a server.
 	 */
-	public static void sync(int config, int count, int speed, int range, int limitedSpawns, int limitedSpawnsAmount, int isCustomRange, int customRange) {
-		put("disable_spawner_config", config);
-		put("disable_count", count);
-		put("disable_speed", speed);
-		put("disable_range", range);
+	public static void sync(int limitedSpawns, int limitedSpawnsAmount) {
 		put("limited_spawns_enabled", limitedSpawns);
 		put("limited_spawns_amount", limitedSpawnsAmount);
-		put("default_spawner_range_enabled", isCustomRange);
-		put("default_spawner_range", customRange);
 		
 		LimitedSpawners.LOGGER.info("Recieved config from server.");
 	}

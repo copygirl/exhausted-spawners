@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import net.mcft.copy.limitedspawners.config.ModConfigManager;
 import net.mcft.copy.limitedspawners.event.SpawnerEventHandler;
 import net.mcft.copy.limitedspawners.networking.LimitedSpawnersPacketHandler;
-import net.mcft.copy.limitedspawners.registry.RegistryHandler;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -42,7 +41,6 @@ public class LimitedSpawners {
 		modEventBus.addListener(this::commonSetup);
 
 		LimitedSpawnersPacketHandler.register();
-		RegistryHandler.init();
 		MinecraftForge.EVENT_BUS.register(new SpawnerEventHandler());
 	}
 

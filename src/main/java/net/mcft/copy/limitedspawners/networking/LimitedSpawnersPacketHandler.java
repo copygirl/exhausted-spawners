@@ -3,7 +3,6 @@ package net.mcft.copy.limitedspawners.networking;
 import net.mcft.copy.limitedspawners.LimitedSpawners;
 import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerConfig;
 import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerEggDrop;
-import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerMessage;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
@@ -26,24 +25,18 @@ public class LimitedSpawnersPacketHandler {
 	);
 	
 	public static void register() {
-        int messageId = 0;
-        
-        INSTANCE.registerMessage(messageId++, 
-        		SyncSpawnerMessage.class, 
-        		SyncSpawnerMessage::encode, 
-        		SyncSpawnerMessage::decode, 
-        		SyncSpawnerMessage::handle);
-        
-        INSTANCE.registerMessage(messageId++, 
-        		SyncSpawnerEggDrop.class, 
-        		SyncSpawnerEggDrop::encode, 
-        		SyncSpawnerEggDrop::decode, 
-        		SyncSpawnerEggDrop::handle);
-        
-        INSTANCE.registerMessage(messageId++, 
-        		SyncSpawnerConfig.class, 
-        		SyncSpawnerConfig::encode, 
-        		SyncSpawnerConfig::decode, 
-        		SyncSpawnerConfig::handle);
-    }
+		int messageId = 0;
+		
+		INSTANCE.registerMessage(messageId++, 
+				SyncSpawnerEggDrop.class, 
+				SyncSpawnerEggDrop::encode, 
+				SyncSpawnerEggDrop::decode, 
+				SyncSpawnerEggDrop::handle);
+		
+		INSTANCE.registerMessage(messageId++, 
+				SyncSpawnerConfig.class, 
+				SyncSpawnerConfig::encode, 
+				SyncSpawnerConfig::decode, 
+				SyncSpawnerConfig::handle);
+	}
 }
