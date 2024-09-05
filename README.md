@@ -1,17 +1,14 @@
 # Exhausted Monster Spawners
 
-.. is a [Forge] mod for Minecraft 1.20.1.  
-It's based on [enhanced-mob-spawners].
-
-It aims to do the following:
-- Limit the number of mobs that can spawn from a spawner.
-- After all mobs have been spawned, the spawner becomes inactive.
-- Destroying the spawner has a chance to spawn eggs.
-- Spawn eggs can be used to recharge the spawner up to its limit.  
-  The spawner must be inactive or currently spawning the same mob type.  
-
-Intended to be used with [KubeJS] or similar to let mobs drop spawn eggs on death.
+.. is a [Forge] mod for Minecraft 1.20.1. It's forked from [Enhanced Mob Spawners]'s
+outdated and unsupported Forge branch, but has been gutted and rewritten to the point
+where barely any of its code remains.
 
 [Forge]: https://github.com/MinecraftForge/MinecraftForge
-[enhanced-mob-spawners]: https://github.com/andersblomqvist/enhanced-mob-spawners
-[KubeJS]: https://github.com/KubeJS-Mods/KubeJS
+[Enhanced Mob Spawners]: https://github.com/andersblomqvist/enhanced-mob-spawners
+
+Most importantly, it aims to do the following:
+- Limit the number of mobs that can spawn from a spawner.
+- After all mobs have been spawned, the spawner becomes empty and inactive.
+- Destroying it may drop spawn eggs depending on amount of remaining mobs.
+- Spawn eggs can also be used to "refill" the spawner.
