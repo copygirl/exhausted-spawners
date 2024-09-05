@@ -152,10 +152,10 @@ dependencies {
 
 mixin {
 	// Refmaps for each SourceSet
-    add sourceSets.main, 'limitedspawners.mixins.refmap.json'
+    add sourceSets.main, 'exhaustedspawners.mixins.refmap.json'
 
     // Configs to add to runs and jars
-    config 'limitedspawners.mixins.json'
+    config 'exhaustedspawners.mixins.json'
 
     // Specify options for dev run configs
     debug.verbose = true

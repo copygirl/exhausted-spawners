@@ -1,4 +1,4 @@
-package net.mcft.copy.limitedspawners.mixin;
+package net.mcft.copy.exhaustedspawners.mixin;
 
 import javax.annotation.Nullable;
 
@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.mcft.copy.limitedspawners.Config;
-import net.mcft.copy.limitedspawners.api.ILimitedSpawner;
+import net.mcft.copy.exhaustedspawners.Config;
+import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

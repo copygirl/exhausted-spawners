@@ -1,4 +1,4 @@
-package net.mcft.copy.limitedspawners;
+package net.mcft.copy.exhaustedspawners;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class Config {
 	static {
 		var common = new ForgeConfigSpec.Builder();
 
-		common.comment("Mob Spawner Settings").push(CATEGORY_SPAWNER);
+		common.comment("Monster Spawner Settings").push(CATEGORY_SPAWNER);
 		SPAWNER_HARDNESS = common
 			.comment("Controls how long a spawner takes to break.")
 			.defineInRange("hardness", 5.0, 0.0, Double.MAX_VALUE);

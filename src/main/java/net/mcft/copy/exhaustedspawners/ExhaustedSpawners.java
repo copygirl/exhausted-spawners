@@ -1,22 +1,22 @@
-package net.mcft.copy.limitedspawners;
+package net.mcft.copy.exhaustedspawners;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.mcft.copy.limitedspawners.event.SpawnerEventHandler;
+import net.mcft.copy.exhaustedspawners.event.SpawnerEventHandler;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 
-@Mod(LimitedSpawners.MOD_ID)
-public class LimitedSpawners {
+@Mod(ExhaustedSpawners.MOD_ID)
+public class ExhaustedSpawners {
 
-	public static final String MOD_ID = "limitedspawners";
+	public static final String MOD_ID = "exhaustedspawners";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public LimitedSpawners() {
+	public ExhaustedSpawners() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
 		MinecraftForge.EVENT_BUS.register(new SpawnerEventHandler());
 	}

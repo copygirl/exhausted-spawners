@@ -1,4 +1,4 @@
-# Limited Mob Spawners
+# Exhausted Monster Spawners
 
 .. is a [Forge] mod for Minecraft 1.20.1.  
 It's based on [enhanced-mob-spawners].
