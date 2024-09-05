@@ -13,6 +13,9 @@ out
 *.iml
 .idea
 
+# vscode
+.vscode
+
 # gradle
 build
 .gradle
@@ -22,6 +25,7 @@ eclipse
 run
 testworld
 testmod.py
+.factorypath
 
 # Files from Forge MDK
 forge*changelog.txt

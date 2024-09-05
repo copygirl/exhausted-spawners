@@ -1,12 +1,17 @@
-# Enhanced mob spawners
-Attempts to add vanilla friendly features to the Spawner block. Such features are:
-- Make Mob Spawners minable with silk touch
-- Right-click on a mob spawner and it will drop its monster egg corresponding to what type of entity inside.
-- Adds a chance for all entities to drop its monster egg
-- Adds Spawner Block in Creative Tabs (decorations)
-- Modify Mob Spawner stats such as count, speed and range. Example: make spawner active for a maximum of 128 blocks! Vanilla is 16
-- Customize what you want inside mod configuration file
-- Toggle spawner ON/OFF with in-game config menu or Redstone
-- Option to turn on limited spawns, via config file! Control number of entities a spawner can spawn before it dies. (currently only on latest fabric version)
+# Limited Mob Spawners
 
-See [Curse mod page](https://www.curseforge.com/minecraft/mc-mods/enhanced-mob-spawners) for more details and pictures.
+.. is a [Forge] mod for Minecraft 1.20.1.  
+It's based on [enhanced-mob-spawners].
+
+It aims to do the following:
+- Limit the number of mobs that can spawn from a spawner.
+- After all mobs have been spawned, the spawner becomes inactive.
+- Destroying the spawner has a chance to spawn eggs.
+- Spawn eggs can be used to recharge the spawner up to its limit.  
+  The spawner must be inactive or currently spawning the same mob type.  
+
+Intended to be used with [KubeJS] or similar to let mobs drop spawn eggs on death.
+
+[Forge]: https://github.com/MinecraftForge/MinecraftForge
+[enhanced-mob-spawners]: https://github.com/andersblomqvist/enhanced-mob-spawners
+[KubeJS]: https://github.com/KubeJS-Mods/KubeJS

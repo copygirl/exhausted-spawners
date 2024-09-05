@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.mcft.copy.limitedspawners.mixin",
+  "refmap": "limitedspawners.mixins.refmap.json",  
+  "mixins": [
+	  "LimitedSpawnsMixin",
+    "SpawnerRangeMixin"
+  ]
+}
