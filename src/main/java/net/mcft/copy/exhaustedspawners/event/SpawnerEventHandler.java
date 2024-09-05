@@ -4,21 +4,13 @@ import java.util.Random;
 
 import net.mcft.copy.exhaustedspawners.Config;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BaseSpawner;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SpawnerBlock;
-import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,44 +24,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class SpawnerEventHandler {
 
 	private Random random = new Random();
-
-	/**
-	 * 	Change hardness for Spawner Block.
-	 *
-	 * 	It calculates a new break speed for the custom hardness. If the custom hardness
-	 * 	is the same as Spawner default it will calculate the same break speed as vanilla.
-	 *
-	 * 	@implNote The wiki tick is at 20 but it gave wrong results when new and original
-	 * 	hardness was the same. Example: newHardness = 5.0 should give 0.95 seconds for a
-	 * 	diamond pick but it gave 3.1 seconds.
-	 *
-	 * 	@see https://minecraft.fandom.com/wiki/Breaking
-	 *
-	 * 	@param event
-	 */
-	@SubscribeEvent
-	public void onBreakSpeedEvent(PlayerEvent.BreakSpeed event) {
-		if(event.getState().getBlock() instanceof SpawnerBlock) {
-
-			float newHardness = Config.SPAWNER_HARDNESS.get().floatValue();
-			float originalHardness = 5.0f;
-
-			// First we calculate how many seconds it will take with new hardness and
-			// original break speed. We want to solve for break speed later.
-			float dmg = event.getOriginalSpeed() / newHardness;
-			dmg /= 100;
-			float ticks = Math.round(1 / dmg);
-			float seconds = ticks / 64f;
-
-			// now do it reverse and insert original hardness
-			float ticks2 = seconds * 64f;
-			float dmg2 = 1 / ticks2;
-			dmg2 *= 100;
-			int newBreakSpeed = Math.round(dmg2 * originalHardness);
-
-			event.setNewSpeed(newBreakSpeed);
-		}
-	}
 
 	/**
 	 * 	Enables mobs to have a small chance to drop an egg
