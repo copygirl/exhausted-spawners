@@ -96,64 +96,6 @@ public class SpawnerEventHandler {
 	}
 
 	/**
-	 * 	Check if Spawner block was powered by redstone or not. Used to disable
-	 * 	or enable the spawner.
-	 */
-	@SubscribeEvent
-	public void onNotifyEvent(BlockEvent.NeighborNotifyEvent event) {
-
-		Level level = (Level)event.getLevel();
-
-		for(Direction dir : Direction.values()) {
-			BlockPos pos = event.getPos().relative(dir);
-			if(level.getBlockState(pos).getBlock() instanceof SpawnerBlock) {
-
-				SpawnerBlockEntity spawner = (SpawnerBlockEntity)level.getBlockEntity(pos);
-				BaseSpawner logic = spawner.getSpawner();
-				CompoundTag nbt = new CompoundTag();
-
-				// Get current spawner config values
-				nbt = logic.save(nbt);
-
-				if(level.hasNeighborSignal(pos)) {
-					short value = nbt.getShort("RequiredPlayerRange");
-
-					// If spawner got disabled via GUI and then we toggle off by redstone
-					// we don't need to do this.
-					if(nbt.getShort("SpawnRange") > 4)
-						return;
-
-					// Read current range and save it temporary in SpawnRange field
-					nbt.putShort("SpawnRange", value);
-
-					// Turn off spawner
-					nbt.putShort("RequiredPlayerRange", (short) 0);
-				}
-				else {
-					// Read what the previus range was (before this spawner was set to range = 0)
-					short pr = nbt.getShort("SpawnRange");
-
-					// If spawner was activated via GUI before, then we dont need to do this
-					if(pr <= 4)
-						return;
-
-					// Set the range backt to what it was
-					nbt.putShort("RequiredPlayerRange", pr);
-
-					// Set SpawnRange back to default=4
-					nbt.putShort("SpawnRange", (short) 4);
-				}
-
-				// Update block
-				logic.load(level, pos, nbt);
-				spawner.setChanged();
-				BlockState blockstate = level.getBlockState(pos);
-				level.sendBlockUpdated(pos, blockstate, blockstate, 3);
-			}
-		}
-	}   
-
-	/**
 	 * 	Enables mobs to have a small chance to drop an egg
 	 */
 	@SubscribeEvent
