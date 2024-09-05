@@ -9,7 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -22,7 +21,6 @@ import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -93,10 +91,6 @@ public class SpawnerEventHandler {
 
 				// Set 0 EXP
 				event.setExpToDrop(0);
-
-				// drop monster egg
-				if(Config.SPAWNER_EGG_REMOVAL.get())
-					dropMonsterEgg(event.getPos(), (Level)event.getLevel());
 			}	
 		}
 	}
@@ -197,73 +191,6 @@ public class SpawnerEventHandler {
 				entity.getY(),
 				entity.getZ(),
 				itemStack));
-	}
-
-	/**
-	 * 	Event when player interacts with block.
-	 * 	Enables so that the player can sneak right click a spawner to get its egg.
-	 */
-	@SubscribeEvent
-	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
-
-		if (!Config.SPAWNER_EGG_REMOVAL.get())
-			return;
-
-		var level  = event.getLevel();
-		var player = event.getEntity();
-		var pos    = event.getPos();
-
-		if (player.isSpectator())
-			return;
-		if (!event.getItemStack().isEmpty() || !player.isCrouching())
-			return;
-		if (!(level.getBlockState(pos).getBlock() instanceof SpawnerBlock))
-			return;
-
-		if (!level.isClientSide) {
-			var spawner = level.getBlockEntity(pos);
-			if (!(spawner instanceof SpawnerBlockEntity)) return;
-			var logic = ((SpawnerBlockEntity)spawner).getSpawner();
-
-			// Get entity ResourceLocation string from spawner by creating a empty compound which we make our
-			// spawner logic write to. We can then access what type of entity id the spawner has inside
-			var nbt = logic.save(new CompoundTag());
-			var entity_string = nbt.get("SpawnData").toString();
-
-			// Leave if the spawner does not contain an entity
-			if (entity_string.indexOf("\"") == -1) return;
-
-			// Strips the string
-			// Example: {id: "minecraft:xxx_xx"} --> minecraft:xxx_xx
-			entity_string = entity_string.substring(entity_string.indexOf("\"") + 1);
-			entity_string = entity_string.substring(0, entity_string.indexOf("\""));
-
-			// Leave if the spawner does not contain an egg
-			if (entity_string.equalsIgnoreCase(EntityType.AREA_EFFECT_CLOUD.toString())) return;
-
-			// Get the entity mob egg and put in an ItemStack
-			var id = new ResourceLocation(entity_string + "_spawn_egg");
-			var item = ForgeRegistries.ITEMS.getValue(id);
-			if (item == null) return;
-
-			// Get random fly-out position offsets
-			var x = pos.getX() + level.random.nextDouble() * 0.7 + 0.15;
-			var y = pos.getY() + level.random.nextDouble() * 0.7 + 0.66;
-			var z = pos.getZ() + level.random.nextDouble() * 0.7 + 0.15;
-
-			var drop = new ItemEntity(level, x, y, z, new ItemStack(item));
-			drop.setDefaultPickUpDelay();
-			level.addFreshEntity(drop);
-
-			// Replace the entity inside the spawner with default entity
-			logic.setEntityId(EntityType.AREA_EFFECT_CLOUD, level, level.random, pos);
-			spawner.setChanged();
-			var state = level.getBlockState(pos);
-			level.sendBlockUpdated(pos, state, state, 3);
-		}
-
-		player.swing(InteractionHand.MAIN_HAND);
-		event.setCanceled(true);
 	}
 
 	/**

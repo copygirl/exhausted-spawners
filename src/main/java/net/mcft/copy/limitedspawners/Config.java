@@ -15,7 +15,6 @@ public class Config {
 	public static ForgeConfigSpec.DoubleValue SPAWNER_HARDNESS;
 	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
 	public static ForgeConfigSpec.IntValue SPAWNER_SPAWN_LIMIT;
-	public static ForgeConfigSpec.BooleanValue SPAWNER_EGG_REMOVAL;
 
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE;
@@ -35,9 +34,6 @@ public class Config {
 		SPAWNER_SPAWN_LIMIT = common
 			.comment("Amount of mobs spawned before spawner becomes inactive. Set to 0 to disable limit.")
 			.defineInRange("spawn_limit", 0, 0, Integer.MAX_VALUE);
-		SPAWNER_EGG_REMOVAL = common
-			.comment("Whether the active spawn egg can be removed from a spawner by sneak-right-clicking with an empty hand.")
-			.define("egg_removal", true);
 		common.pop();
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);
