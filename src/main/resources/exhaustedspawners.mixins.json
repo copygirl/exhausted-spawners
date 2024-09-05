@@ -3,5 +3,8 @@
   "minVersion": "0.8",
   "package": "net.mcft.copy.exhaustedspawners.mixin",
   "refmap": "exhaustedspawners.mixins.refmap.json",
-  "mixins": [ "LimitedSpawnerMixin" ]
+  "mixins": [
+    "LimitedSpawnerMixin",
+    "SpawnerHarvestMixin"
+  ]
 }

@@ -5,9 +5,7 @@ import java.util.Random;
 import net.mcft.copy.exhaustedspawners.Config;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,7 +19,6 @@ import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -75,27 +72,6 @@ public class SpawnerEventHandler {
 	}
 
 	/**
-	 * 	Prevent XP drop when spawner is destroyed with silk touch.
-	 * 	The Spawner block is returned via loot tables json
-	 */
-	@SubscribeEvent
-	public void onBlockBreakEvent(BlockEvent.BreakEvent event) {
-
-		// Check if a spawner broke
-		if(event.getState().getBlock() instanceof SpawnerBlock) {
-
-			ListTag list = event.getPlayer().getMainHandItem().getEnchantmentTags();
-
-			// Check if we broke the spawner with silk touch and if it's not disabled in config
-			if(checkSilkTouch(list) && Config.SPAWNER_SILK_TOUCH.get()) {
-
-				// Set 0 EXP
-				event.setExpToDrop(0);
-			}
-		}
-	}
-
-	/**
 	 * 	Enables mobs to have a small chance to drop an egg
 	 */
 	@SubscribeEvent
@@ -133,77 +109,6 @@ public class SpawnerEventHandler {
 				entity.getY(),
 				entity.getZ(),
 				itemStack));
-	}
-
-	/**
-	 * 	Drops the Monster Egg which is inside the spawner when the spawner is harvested.
-	 * 	This is only server side.
-	 *
-	 * 	@param pos Spawner block position
-	 * 	@param world World reference for spawning
-	 */
-	private void dropMonsterEgg(BlockPos pos, Level level) {
-		BlockState blockstate = level.getBlockState(pos);
-		SpawnerBlockEntity spawner = (SpawnerBlockEntity)level.getBlockEntity(pos);
-		BaseSpawner logic = spawner.getSpawner();
-
-		// Get entity ResourceLocation string from spawner by creating a empty compound which we make our
-		// spawner logic write to. We can then access what type of entity id the spawner has inside
-		CompoundTag nbt = new CompoundTag();
-		nbt = logic.save(nbt);
-		String entity_string = nbt.get("SpawnData").toString();
-
-		// Leave if the spawner does not contain an entity
-		if(entity_string.indexOf("\"") == -1)
-			return;
-
-		// Strips the string
-		// Example: {id: "minecraft:xxx_xx"} --> minecraft:xxx_xx
-		entity_string = entity_string.substring(entity_string.indexOf("\"") + 1);
-		entity_string = entity_string.substring(0, entity_string.indexOf("\""));
-
-		// Leave if the spawner does not contain an egg
-		if(entity_string.equalsIgnoreCase(EntityType.AREA_EFFECT_CLOUD.toString()))
-			return;
-
-		// Get the entity mob egg and put in an ItemStack
-		ItemStack itemStack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(entity_string + "_spawn_egg")));
-
-		// Get random fly-out position offsets
-		double d0 = (double)(level.random.nextFloat() * 0.7F) + (double)0.15F;
-		double d1 = (double)(level.random.nextFloat() * 0.7F) + (double)0.06F + 0.6D;
-		double d2 = (double)(level.random.nextFloat() * 0.7F) + (double)0.15F;
-
-		// Create entity item
-		ItemEntity entityItem = new ItemEntity(
-				level,
-				(double)pos.getX() + d0,
-				(double)pos.getY() + d1,
-				(double)pos.getZ() + d2,
-				itemStack);
-		entityItem.setDefaultPickUpDelay();
-
-		// Spawn entity item (egg)
-		level.addFreshEntity(entityItem);
-
-		// Replace the entity inside the spawner with default entity
-		logic.setEntityId(EntityType.AREA_EFFECT_CLOUD, level, level.random, pos);
-		spawner.setChanged();
-		level.sendBlockUpdated(pos, blockstate, blockstate, 3);
-	}
-
-	/**
-	 * 	Check a tools item enchantment list contains Silk Touch enchant
-	 * 	I don't know if there's a better way to do this
-	 *
-	 * 	@param NBTTagList of enchantment
-	 * 	@return true/false
-	 */
-	private boolean checkSilkTouch(ListTag list) {
-		if(list.getAsString().indexOf("minecraft:silk_touch") != -1)
-			return true;
-		else
-			return false;
 	}
 
 	/**
