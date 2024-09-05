@@ -2,30 +2,21 @@ package net.mcft.copy.limitedspawners.event;
 
 import java.util.Random;
 
-import net.mcft.copy.limitedspawners.LimitedSpawners;
-import net.mcft.copy.limitedspawners.config.ConfigValues;
-import net.mcft.copy.limitedspawners.networking.LimitedSpawnersPacketHandler;
-import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerConfig;
-import net.mcft.copy.limitedspawners.networking.packet.SyncSpawnerEggDrop;
+import net.mcft.copy.limitedspawners.Config;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SpawnerBlock;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +26,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
@@ -47,25 +37,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class SpawnerEventHandler {
 
 	private Random random = new Random();
-
-	/**
-	 * 	Sync client config with server config when a client joins a server.
-	 * 
-	 * 	@param event when player connects to the server.
-	 */
-	@SubscribeEvent
-	public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-		ServerPlayer player = (ServerPlayer) event.getEntity();
-
-		LimitedSpawners.LOGGER.info("Sending config to player.");
-
-		LimitedSpawnersPacketHandler.INSTANCE.sendTo(
-				new SyncSpawnerConfig(
-						ConfigValues.get("limited_spawns_enabled"),
-						ConfigValues.get("limited_spawns_amount")),
-				player.connection.connection,
-				NetworkDirection.PLAY_TO_CLIENT);
-	}
 
 	/**
 	 * 	Change hardness for Spawner Block.
@@ -85,7 +56,7 @@ public class SpawnerEventHandler {
 	public void onBreakSpeedEvent(PlayerEvent.BreakSpeed event) {
 		if(event.getState().getBlock() instanceof SpawnerBlock) {
 
-			float newHardness = ConfigValues.get("spawner_hardness");
+			float newHardness = Config.SPAWNER_HARDNESS.get().floatValue();
 			float originalHardness = 5.0f;
 
 			// First we calculate how many seconds it will take with new hardness and
@@ -113,18 +84,18 @@ public class SpawnerEventHandler {
 	public void onBlockBreakEvent(BlockEvent.BreakEvent event) {
 
 		// Check if a spawner broke
-		if(event.getState().getBlock() == Blocks.SPAWNER) {
+		if(event.getState().getBlock() instanceof SpawnerBlock) {
 
 			ListTag list = event.getPlayer().getMainHandItem().getEnchantmentTags();
 
 			// Check if we broke the spawner with silk touch and if it's not disabled in config
-			if(checkSilkTouch(list) && ConfigValues.get("disable_silk_touch") == 0) {
+			if(checkSilkTouch(list) && Config.SPAWNER_SILK_TOUCH.get()) {
 
 				// Set 0 EXP
 				event.setExpToDrop(0);
 
 				// drop monster egg
-				if(ConfigValues.get("disable_egg_removal_from_spawner") == 0)
+				if(Config.SPAWNER_EGG_REMOVAL.get())
 					dropMonsterEgg(event.getPos(), (Level)event.getLevel());
 			}	
 		}
@@ -197,10 +168,10 @@ public class SpawnerEventHandler {
 		boolean causedByPlayer = event.getSource().getEntity() instanceof Player ? true : false;
 
 		// Leave if eggs should only drop when killed by a player
-		if(ConfigValues.get("monster_egg_only_drop_when_killed_by_player") == 1 && !causedByPlayer)
+		if(Config.SPAWN_EGG_PLAYER_KILL_REQUIRED.get() && !causedByPlayer)
 			return;
 
-		if(random.nextFloat() > ConfigValues.get("monster_egg_drop_chance") / 100f)
+		if(random.nextFloat() >= Config.SPAWN_EGG_DROP_CHANCE.get())
 			return;
 
 		Entity entity = event.getEntity();
@@ -214,7 +185,7 @@ public class SpawnerEventHandler {
 		// Convert to "minecraft:pig"
 		String entityName = getEntityName(entityType);
 
-		if(ConfigValues.isEggDisabled(entityName))
+		if(Config.SPAWN_EGG_DROP_BLACKLIST.get().contains(entityName))
 			return;
 
 		ItemStack itemStack = new ItemStack(ForgeRegistries.ITEMS .getValue(new ResourceLocation(entityName + "_spawn_egg")));
@@ -230,41 +201,69 @@ public class SpawnerEventHandler {
 
 	/**
 	 * 	Event when player interacts with block.
-	 * 	Enables so that the player can right click a spawner to get its egg.
+	 * 	Enables so that the player can sneak right click a spawner to get its egg.
 	 */
 	@SubscribeEvent
 	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
-		Item item = event.getItemStack().getItem();
-		
-		// Leave if we are client and if we are holding a block. Also prevent off hand action
-		if(item instanceof BlockItem ||
-				item instanceof SpawnEggItem ||
-				event.getHand() == InteractionHand.OFF_HAND)
+
+		if (!Config.SPAWNER_EGG_REMOVAL.get())
 			return;
 
-		Level level = event.getLevel();
-		
-		// Leave if server
-		if(!level.isClientSide || event.getEntity().isSpectator())
+		var level  = event.getLevel();
+		var player = event.getEntity();
+		var pos    = event.getPos();
+
+		if (player.isSpectator())
 			return;
-		
-		BlockPos blockpos = event.getPos();
-		
-		// Leave if we didn't right click a spawner block
-		if(level.getBlockState(blockpos).getBlock() != Blocks.SPAWNER)
+		if (!event.getItemStack().isEmpty() || !player.isCrouching())
 			return;
-		
-		// Leave if item is part of the item id blacklist
-		String registryName = ForgeRegistries.ITEMS.getKey(item).toString();
-				
-		if(ConfigValues.get("display_item_id_from_right_click_in_log") == 1)
-			LimitedSpawners.LOGGER.info("Right clicked with item id: " + registryName);
-		
-		if(ConfigValues.isItemIdBlacklisted(registryName))
+		if (!(level.getBlockState(pos).getBlock() instanceof SpawnerBlock))
 			return;
-		
-		// Send Network message
-		LimitedSpawnersPacketHandler.INSTANCE.sendToServer(new SyncSpawnerEggDrop(blockpos));
+
+		if (!level.isClientSide) {
+			var spawner = level.getBlockEntity(pos);
+			if (!(spawner instanceof SpawnerBlockEntity)) return;
+			var logic = ((SpawnerBlockEntity)spawner).getSpawner();
+
+			// Get entity ResourceLocation string from spawner by creating a empty compound which we make our
+			// spawner logic write to. We can then access what type of entity id the spawner has inside
+			var nbt = logic.save(new CompoundTag());
+			var entity_string = nbt.get("SpawnData").toString();
+
+			// Leave if the spawner does not contain an entity
+			if (entity_string.indexOf("\"") == -1) return;
+
+			// Strips the string
+			// Example: {id: "minecraft:xxx_xx"} --> minecraft:xxx_xx
+			entity_string = entity_string.substring(entity_string.indexOf("\"") + 1);
+			entity_string = entity_string.substring(0, entity_string.indexOf("\""));
+
+			// Leave if the spawner does not contain an egg
+			if (entity_string.equalsIgnoreCase(EntityType.AREA_EFFECT_CLOUD.toString())) return;
+
+			// Get the entity mob egg and put in an ItemStack
+			var id = new ResourceLocation(entity_string + "_spawn_egg");
+			var item = ForgeRegistries.ITEMS.getValue(id);
+			if (item == null) return;
+
+			// Get random fly-out position offsets
+			var x = pos.getX() + level.random.nextDouble() * 0.7 + 0.15;
+			var y = pos.getY() + level.random.nextDouble() * 0.7 + 0.66;
+			var z = pos.getZ() + level.random.nextDouble() * 0.7 + 0.15;
+
+			var drop = new ItemEntity(level, x, y, z, new ItemStack(item));
+			drop.setDefaultPickUpDelay();
+			level.addFreshEntity(drop);
+
+			// Replace the entity inside the spawner with default entity
+			logic.setEntityId(EntityType.AREA_EFFECT_CLOUD, level, level.random, pos);
+			spawner.setChanged();
+			var state = level.getBlockState(pos);
+			level.sendBlockUpdated(pos, state, state, 3);
+		}
+
+		player.swing(InteractionHand.MAIN_HAND);
+		event.setCanceled(true);
 	}
 
 	/**
