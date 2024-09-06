@@ -36,7 +36,7 @@ public class RefillingHandler {
 			// Keep the default behavior of SpawnEggItem, but
 			// also make sure to reset the remaining mob count.
 			spawner.setLimit(-1);
-		} if (player.isSpectator()) {
+		} else if (player.isSpectator()) {
 			// Do nothing if spectator.
 		} else {
 			var isEmpty   = spawner.isEmpty();
