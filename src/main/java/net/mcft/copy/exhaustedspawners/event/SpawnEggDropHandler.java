@@ -47,6 +47,9 @@ public class SpawnEggDropHandler {
 		var causedByPlayer = killer instanceof Player;
 		if (Config.SPAWN_EGG_PLAYER_KILL_REQUIRED.get() && !causedByPlayer) return;
 
+		// Apply looting bonus to drop chance.
+		chance += event.getLootingLevel() * Config.SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS.get();
+
 		// TODO: Technically incorrect, but there might not be a way to get the actual item used for the kill.
 		var killerItem = (killer instanceof LivingEntity) ? ((LivingEntity)killer).getMainHandItem() : ItemStack.EMPTY;
 		var silkTouch  = killerItem.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0;

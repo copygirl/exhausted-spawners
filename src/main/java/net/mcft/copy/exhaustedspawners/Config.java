@@ -17,6 +17,7 @@ public class Config {
 
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE;
+	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS;
 	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_PLAYER_KILL_REQUIRED;
 	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_EGG;
 	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH;
@@ -40,8 +41,11 @@ public class Config {
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);
 		SPAWN_EGG_DROP_CHANCE = common
-			.comment("Chance for a mob to drop its spawn egg when killed. Set to 0.0 to disable. (Default: 0.04)")
-			.defineInRange("drop_chance", 0.04, 0.0, 1.0);
+			.comment("Chance for a mob to drop its spawn egg when killed. Set to 0.0 to disable. (Default: 0.03)")
+			.defineInRange("drop_chance", 0.03, 0.0, 1.0);
+		SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS = common
+			.comment("Increases drop chance by this value for each effective looting level. (Default: 0.01)")
+			.defineInRange("drop_chance_looting_bonus", 0.01, 0.0, 1.0);
 		SPAWN_EGG_PLAYER_KILL_REQUIRED = common
 			.comment("Whether a player kill is required for mobs to drop their spawn egg. (Default: true)")
 			.define("player_kill_required", true);
