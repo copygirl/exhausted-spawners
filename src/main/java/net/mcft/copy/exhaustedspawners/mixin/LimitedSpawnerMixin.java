@@ -63,7 +63,7 @@ public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 
 	@Override
 	public int getLimit() {
-		return Config.SPAWNER_SPAWN_LIMIT.get();
+		return Config.SPAWN_LIMIT.get();
 	}
 
 	@Override

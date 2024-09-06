@@ -11,55 +11,73 @@ public class Config {
 	public static ForgeConfigSpec COMMON_CONFIG;
 
 	public static final String CATEGORY_SPAWNER = "spawner";
-	public static ForgeConfigSpec.IntValue SPAWNER_SPAWN_LIMIT;
+	public static ForgeConfigSpec.IntValue SPAWN_LIMIT;
 	public static ForgeConfigSpec.DoubleValue SPAWNER_HARDNESS;
 	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
 
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
-	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE;
-	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS;
-	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_PLAYER_KILL_REQUIRED;
-	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_EGG;
-	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH;
-	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_NON_SILK_TOUCH_MODIFIER;
-	public static ForgeConfigSpec.ConfigValue<List<? extends String>> SPAWN_EGG_DROP_BLACKLIST;
+	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
+	public static ForgeConfigSpec.DoubleValue EGG_DROP_LOOTING_BONUS;
+	public static ForgeConfigSpec.DoubleValue EGG_DROP_NON_SILK_TOUCH_MODIFIER;
+	public static ForgeConfigSpec.BooleanValue PLAYER_KILL_REQUIRED;
+	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_EGG;
+	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_SILK_TOUCH;
+	public static ForgeConfigSpec.ConfigValue<List<? extends String>> EGG_DROP_BLACKLIST;
 
 	static {
 		var common = new ForgeConfigSpec.Builder();
 
 		common.comment("Monster Spawner Settings").push(CATEGORY_SPAWNER);
-		SPAWNER_SPAWN_LIMIT = common
-			.comment("Amount of mobs spawned before spawner becomes inactive. Set to 0 to disable limit. (Default: 64)")
+		SPAWN_LIMIT = common.comment(
+				"Amount of mobs spawned before spawner becomes inactive.",
+				"Set to 0 to disable, making spawners work like normal.",
+				"(Default: 64)")
 			.defineInRange("spawn_limit", 64, 0, Integer.MAX_VALUE);
-		SPAWNER_HARDNESS = common
-			.comment("Controls how long a spawner takes to break. (Default: 5.0)")
+		SPAWNER_HARDNESS = common.comment(
+				"Controls how long a spawner takes to break.",
+				"(Default: 5.0)")
 			.defineInRange("hardness", 5.0, 0.0, Double.POSITIVE_INFINITY);
-		SPAWNER_SILK_TOUCH = common
-			.comment("Whether a spawner can be retrieved using Silk Touch enchantment. (Default: true)")
+		SPAWNER_SILK_TOUCH = common.comment(
+				"Whether a spawner can be retrieved using Silk Touch enchantment.",
+				"(Default: true)")
 			.define("silk_touch", true);
 		common.pop();
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);
-		SPAWN_EGG_DROP_CHANCE = common
-			.comment("Chance for a mob to drop its spawn egg when killed. Set to 0.0 to disable. (Default: 0.03)")
+		EGG_DROP_CHANCE = common.comment(
+				"Chance for a mob to drop its spawn egg when killed.",
+				"Set to 0.0 to disable.",
+				"(Default: 0.03)")
 			.defineInRange("drop_chance", 0.03, 0.0, 1.0);
-		SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS = common
-			.comment("Increases drop chance by this value for each effective looting level. (Default: 0.01)")
-			.defineInRange("drop_chance_looting_bonus", 0.01, 0.0, 1.0);
-		SPAWN_EGG_PLAYER_KILL_REQUIRED = common
-			.comment("Whether a player kill is required for mobs to drop their spawn egg. (Default: true)")
-			.define("player_kill_required", true);
-		SPAWN_EGG_CLEAR_DROPS_WHEN_EGG = common
-			.comment("Whether to clear any other mob drops (except equipment) when a spawn egg is dropped. (Default: false)")
-			.define("clear_drops_when_egg", false);
-		SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH = common
-			.comment("Whether to always clear mob drops (except equipment) when a Silk Touch item is used. (Default: false)")
-			.define("clear_drops_when_silk_touch", false);
-		SPAWN_EGG_NON_SILK_TOUCH_MODIFIER = common
-			.comment("Drop chance multiplayer when an item without silk touch is used. (Default: 1.0)")
+		EGG_DROP_LOOTING_BONUS = common.comment(
+				"Increases drop chance by this value for each effective looting level.",
+				"(Default: 0.01)")
+			.defineInRange("looting_bonus", 0.01, 0.0, 1.0);
+		EGG_DROP_NON_SILK_TOUCH_MODIFIER = common.comment(
+				"Drop chance multiplayer when an item without Silk Touch is used.",
+				"Applied after looting bonus. Can be set to 0.0 to require Silk Touch.",
+				"To have weapons be enchantable with Silk Touch, use Forgery's 'weapons_accept_silk' tweak.",
+				"Example: drop_chance=0.2, non_silk_touch_modifier=0.025 will result in items",
+				"         with silk touch having 20% chance, while without having a 0.5% chance.",
+				"(Default: 1.0)")
 			.defineInRange("non_silk_touch_modifier", 1.0, 0.0, 1.0);
-		SPAWN_EGG_DROP_BLACKLIST = common
-			.comment("Blacklist of mobs that should not drop their spawn eggs when killed. (Default: [])")
+		PLAYER_KILL_REQUIRED = common.comment(
+				"Whether a player kill is required for mobs to drop their spawn egg.",
+				"Note: Some automation mods can fill this requirement using a fake player.",
+				"(Default: true)")
+			.define("player_kill_required", true);
+		CLEAR_DROPS_ON_EGG = common.comment(
+				"Whether to clear any other mob drops (except equipment) when a spawn egg is dropped.",
+				"(Default: false)")
+			.define("clear_drops_on_egg", false);
+		CLEAR_DROPS_ON_SILK_TOUCH = common.comment(
+				"Whether to always clear mob drops (except equipment) when a Silk Touch item is used.",
+				"(Default: false)")
+			.define("clear_drops_on_silk_touch", false);
+		EGG_DROP_BLACKLIST = common.comment(
+				"Blacklist of mobs that should not drop their spawn eggs when killed.",
+				"Example: [\"minecraft:creeper\", \"minecraft:ghast\"]",
+				"(Default: [])")
 			.defineList("drop_blacklist", ImmutableList.of(), obj -> ResourceLocation.isValidResourceLocation((String)obj));
 		common.pop();
 

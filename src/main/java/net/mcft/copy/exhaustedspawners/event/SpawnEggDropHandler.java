@@ -40,27 +40,27 @@ public class SpawnEggDropHandler {
 
 	@SubscribeEvent
 	public void onLivingDropsEvent(LivingDropsEvent event) {
-		var chance = Config.SPAWN_EGG_DROP_CHANCE.get().doubleValue();
+		var chance = Config.EGG_DROP_CHANCE.get().doubleValue();
 		if (chance <= 0.0) return; // Functionality is disabled.
 
 		var killer = event.getSource().getEntity();
 		var causedByPlayer = killer instanceof Player;
-		if (Config.SPAWN_EGG_PLAYER_KILL_REQUIRED.get() && !causedByPlayer) return;
+		if (Config.PLAYER_KILL_REQUIRED.get() && !causedByPlayer) return;
 
 		// Apply looting bonus to drop chance.
-		chance += event.getLootingLevel() * Config.SPAWN_EGG_DROP_CHANCE_LOOTING_BONUS.get();
+		chance += event.getLootingLevel() * Config.EGG_DROP_LOOTING_BONUS.get();
 
 		// TODO: Technically incorrect, but there might not be a way to get the actual item used for the kill.
 		var killerItem = (killer instanceof LivingEntity) ? ((LivingEntity)killer).getMainHandItem() : ItemStack.EMPTY;
 		var silkTouch  = killerItem.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0;
 
 		// If not using a silk touch item, multiply drop chance by non-silktouch modifier.
-		if (!silkTouch) chance *= Config.SPAWN_EGG_NON_SILK_TOUCH_MODIFIER.get();
+		if (!silkTouch) chance *= Config.EGG_DROP_NON_SILK_TOUCH_MODIFIER.get();
 
 		var entity = event.getEntity();
 
 		// If a silk touch item is used, and drops should be cleared when using silk touch, do that.
-		if (silkTouch && Config.SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH.get()) clearNonEquipment(event.getDrops());
+		if (silkTouch && Config.CLEAR_DROPS_ON_SILK_TOUCH.get()) clearNonEquipment(event.getDrops());
 
 		// Check if RNGesus is with us this day.
 		if (entity.getRandom().nextFloat() >= chance) return;
@@ -69,13 +69,13 @@ public class SpawnEggDropHandler {
 		var entityId   = EntityType.getKey(entityType);
 
 		// If entity id is contained in blacklist, don't drop anything.
-		if (Config.SPAWN_EGG_DROP_BLACKLIST.get().contains(entityId.toString())) return;
+		if (Config.EGG_DROP_BLACKLIST.get().contains(entityId.toString())) return;
 
 		var spawnEgg = ForgeSpawnEggItem.fromEntityType(entityType);
 		if (spawnEgg == null) return; // No spawn egg found.
 
 		// If mob drops should be cleared when a spawn egg is dropped, do that.
-		if (Config.SPAWN_EGG_CLEAR_DROPS_WHEN_EGG.get()) clearNonEquipment(event.getDrops());
+		if (Config.CLEAR_DROPS_ON_EGG.get()) clearNonEquipment(event.getDrops());
 
 		event.getDrops().add(new ItemEntity(entity.level(),
 				entity.getX(), entity.getY(), entity.getZ(),
