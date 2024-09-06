@@ -30,6 +30,6 @@ displayURL="https://github.com/copygirl/exhausted-monster-spawners" #optional
 logoFile="icon.png" #optional
 
 # A text field displayed in the mod UI
-authors="copygirl, Branders" #optional
+authors="copygirl" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description=''''''
