@@ -2,7 +2,7 @@ package net.mcft.copy.exhaustedspawners;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import net.mcft.copy.exhaustedspawners.event.SpawnerEventHandler;
+import net.mcft.copy.exhaustedspawners.event.SpawnEggDropHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -16,6 +16,6 @@ public class ExhaustedSpawners {
 
 	public ExhaustedSpawners() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
-		MinecraftForge.EVENT_BUS.register(new SpawnerEventHandler());
+		MinecraftForge.EVENT_BUS.register(new SpawnEggDropHandler());
 	}
 }
