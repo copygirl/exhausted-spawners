@@ -46,10 +46,10 @@ public class Config {
 			.comment("Whether a player kill is required for mobs to drop their spawn egg. (Default: true)")
 			.define("player_kill_required", true);
 		SPAWN_EGG_CLEAR_DROPS_WHEN_EGG = common
-			.comment("Whether to clear any other mob drops when a spawn egg is dropped. (Default: false)")
+			.comment("Whether to clear any other mob drops (except equipment) when a spawn egg is dropped. (Default: false)")
 			.define("clear_drops_when_egg", false);
 		SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH = common
-			.comment("Whether to always clear drops when a Silk Touch is used to kill the mob. (Default: false)")
+			.comment("Whether to always clear mob drops (except equipment) when a Silk Touch item is used. (Default: false)")
 			.define("clear_drops_when_silk_touch", false);
 		SPAWN_EGG_NON_SILK_TOUCH_MODIFIER = common
 			.comment("Drop chance multiplayer when an item without silk touch is used. (Default: 1.0)")
