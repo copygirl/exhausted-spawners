@@ -11,10 +11,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.mcft.copy.exhaustedspawners.Config;
+import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
 import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SpawnData;
@@ -23,34 +25,40 @@ import net.minecraft.world.level.block.LevelEvent;
 @Mixin(BaseSpawner.class)
 public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 
-	/**
-	 * Number of mobs spawned by this spawner.
-	 * May be decreased or reset to increase the limit.
-	 * May be negative to increase the limit beyond the default.
-	 */
+	/** Total number of mobs spawned by this spawner. */
 	private int spawned = 0;
+	/** Current limit of mobs that may be spawned. */
+	private int limit = -1;
 
 	@Inject(method = "load", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/nbt/CompoundTag;getShort(Ljava/lang/String;)S"))
 	private void load(Level level, BlockPos pos, CompoundTag nbt, CallbackInfo info) {
-		if (getLimit() == 0) return; // Check if limited spawns are enabled.
-		spawned = nbt.getInt(ILimitedSpawner.SPAWNED_NBT_KEY);
+		if (Config.SPAWN_LIMIT.get() == 0) return; // Functionality disabled.
+		spawned = nbt.getInt(SPAWNED_NBT_KEY);
+		limit   = nbt.contains(LIMIT_NBT_KEY) ? nbt.getInt(LIMIT_NBT_KEY) : -1;
 	}
 
 	@Inject(method = "save", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/nbt/CompoundTag;putShort(Ljava/lang/String;S)V"))
 	private void save(CompoundTag nbt, CallbackInfoReturnable<CompoundTag> info) {
-		if (getLimit() == 0) return;
-		nbt.putInt(ILimitedSpawner.SPAWNED_NBT_KEY, spawned);
+		if (Config.SPAWN_LIMIT.get() == 0) return;
+		nbt.putInt(SPAWNED_NBT_KEY, spawned);
+		nbt.putInt(LIMIT_NBT_KEY, limit);
 	}
 
 	@Inject(method = "serverTick", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/server/level/ServerLevel;levelEvent(ILnet/minecraft/core/BlockPos;I)V"))
 	private void onEntitySpawned(ServerLevel level, BlockPos pos, CallbackInfo ci) {
-		if (getLimit() == 0) return; // Functionality disabled.
-		var remaining = getRemaining() - 1;
-		if (remaining <= 0) clear();
-		else adjustRemaining(-1);
+		var configured_limit = Config.SPAWN_LIMIT.get();
+		if (configured_limit == 0) return; // Functionality disabled.
+
+		// If limit is unset, set it to the configured limit.
+		if (limit < 0) setLimit(spawned + configured_limit);
+
+		spawned++; // Increase number of mobs spawned so far.
+		if (getRemaining() <= 0) clear(); // Empty, so fizzle!
+
+		ExhaustedSpawners.LOGGER.info("SPAWN! spawned={}, limit={}", spawned, limit);
 	}
 
 	@ModifyVariable(method = "serverTick", at = @At("STORE"))
@@ -62,54 +70,60 @@ public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 	// ILimitedSpawner implementation
 
 	@Override
-	public int getLimit() {
-		return Config.SPAWN_LIMIT.get();
-	}
-
-	@Override
 	public boolean isEmpty() {
 		if (nextSpawnData == null) return true;
 		if (!nextSpawnData.entityToSpawn().contains("id", 8)) return true;
-		if (getLimit() == 0) return false;
-		return getRemaining() == 0;
+		return getRemaining() <= 0;
 	}
 
 	@Override
-	public int getRemaining() {
-		var limit = getLimit();
-		if (limit == 0) return Integer.MAX_VALUE;
-		if (nextSpawnData == null) return 0;
-		if (!nextSpawnData.entityToSpawn().contains("id", 8)) return 0;
-		return Math.max(0, limit - spawned);
+	public int getSpawned() { return spawned; }
+
+	@Override
+	public int getLimit() {
+		var configured_limit = Config.SPAWN_LIMIT.get();
+		if (configured_limit <= 0) return Integer.MAX_VALUE;
+		return (limit >= 0) ? limit : spawned + configured_limit;
 	}
 
 	@Override
-	public void adjustRemaining(int value) {
-		var limit = getLimit();
-		spawned = Math.min(limit, spawned - value);
+	public void setLimit(int value) { limit = value; }
+
+	@Override
+	@Nullable
+	public EntityType<?> getSpawnedEntityType() {
+		if (nextSpawnData == null) return null;
+		return EntityType.by(nextSpawnData.entityToSpawn()).orElse(null);
 	}
 
 	@Override
-	public void resetRemaining() {
-		spawned = 0;
-	}
-
-	@Override
-	public void clear() {
-		var spawner = (BaseSpawner)(Object)this;
+	public void setSpawnedEntityType(@Nullable EntityType<?> value) {
+		var spawner     = (BaseSpawner)(Object)this;
 		var blockEntity = spawner.getSpawnerBlockEntity();
 		if (blockEntity == null) return;
 
 		var level = blockEntity.getLevel();
 		if ((level == null) || level.isClientSide) return;
 
-		if (!isEmpty()) level.levelEvent(
-			LevelEvent.LAVA_FIZZ,
-			blockEntity.getBlockPos(), 0);
+		var pos = blockEntity.getBlockPos();
+		if (value != null) spawner.setEntityId(value, level, level.random, pos);
+		else invokeSetNextSpawnData(level, pos, new SpawnData());
+	}
+
+	@Override
+	public void clear() {
+		var spawner     = (BaseSpawner)(Object)this;
+		var blockEntity = spawner.getSpawnerBlockEntity();
+		if (blockEntity == null) return;
+
+		var level = blockEntity.getLevel();
+		if ((level == null) || level.isClientSide) return;
 
 		var pos = blockEntity.getBlockPos();
+		// If spawner is not already empty, cause a fizz "animation" on the spawner.
+		if (getSpawnedEntityType() != null) level.levelEvent(LevelEvent.LAVA_FIZZ, pos, 0);
+		// Clear out nextSpawnData, removing the entity in the spawner.
 		invokeSetNextSpawnData(level, pos, new SpawnData());
-		resetRemaining();
 	}
 
 	@Shadow

@@ -2,6 +2,8 @@ package net.mcft.copy.exhaustedspawners;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.mcft.copy.exhaustedspawners.event.RefillingHandler;
 import net.mcft.copy.exhaustedspawners.event.SpawnEggDropHandler;
 import net.mcft.copy.exhaustedspawners.event.SpawnerHarvestHandler;
 import net.mcft.copy.exhaustedspawners.loot.LootConditions;
@@ -24,7 +26,8 @@ public class ExhaustedSpawners {
 		LootConditions.register(modEventBus);
 
 		var forgeEventBus = MinecraftForge.EVENT_BUS;
-		forgeEventBus.register(new SpawnEggDropHandler());
 		forgeEventBus.register(new SpawnerHarvestHandler());
+		forgeEventBus.register(new RefillingHandler());
+		forgeEventBus.register(new SpawnEggDropHandler());
 	}
 }

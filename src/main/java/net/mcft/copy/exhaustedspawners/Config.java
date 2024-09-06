@@ -15,6 +15,9 @@ public class Config {
 	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
 	public static ForgeConfigSpec.DoubleValue SPAWNER_BREAK_SPEED;
 
+	public static final String CATEGORY_REFILLING = "refilling";
+	public static ForgeConfigSpec.IntValue AMOUNT_REFILLED;
+
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_LOOTING_BONUS;
@@ -44,6 +47,15 @@ public class Config {
 				"For example, a value of 0.1 would make it take 10 times as long to break.",
 				"(Default: 1.0)")
 			.defineInRange("break_speed", 1.0, 0.0, Double.POSITIVE_INFINITY);
+		common.pop();
+
+		common.comment("Refilling Settings").push(CATEGORY_REFILLING);
+		AMOUNT_REFILLED = common.comment(
+				"Amount of mobs a spawner is recharged with when a spawn egg is used on it.",
+				"Requires the spawner to be empty or to already be spawning the same mob type.",
+				"Keep drop chances lower than 1 / this value, or you can end up with a positive feedback loop.",
+				"(Default: 16)")
+			.defineInRange("amount_refilled", 16, 0, Integer.MAX_VALUE);
 		common.pop();
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);

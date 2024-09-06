@@ -1,6 +1,9 @@
 package net.mcft.copy.exhaustedspawners.api;
 
+import javax.annotation.Nullable;
+
 import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
+import net.minecraft.world.entity.EntityType;
 
 /**
  * Implemented by BaseSpawner using a mixin.
@@ -8,41 +11,34 @@ import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
  */
 public interface ILimitedSpawner {
 
-	/** The NBT key used to save/load the number of spawned mobs. */
+	// NBT keys used to save/load additional fields added by LimitedSpawnerMixin.
 	static final String SPAWNED_NBT_KEY = ExhaustedSpawners.MOD_ID + ":spawned";
+	static final String LIMIT_NBT_KEY   = ExhaustedSpawners.MOD_ID + ":limit";
 
-	/**
-	 * Returns the configurated limit of mobs that can be spawned before
-	 * this spawner empties out, or 0 if this functionality is disabled.
-	 */
-	int getLimit();
-
-	/**
-	 * Returns if this spawner is empty and can't spawn any more mobs.
-	 */
+	/** Returns if this spawner is empty and can't spawn any more mobs. */
 	boolean isEmpty();
 
-	/**
-	 * Returns the amount of remaining mobs to be spawned from this spawner,
-	 * or {@link Integer#MAX_VALUE} if the functionality is disabled.
-	 */
-	int getRemaining();
+	/** Gets how many mobs this spawner has spawned total. */
+	int getSpawned();
 
-	/**
-	 * Adjusts the amount of remaining mobs to be
-	 * spawned from this spawner by a relative value.
-	 */
-	void adjustRemaining(int value);
+	/** Returns the limit of mobs that can be spawned before this spawner empties. */
+	int getLimit();
 
-	/**
-	 * Resets the amount of remaining mobs to be
-	 * spawned from this spawner to the default limit.
-	 */
-	void resetRemaining();
+	/** Sets the limit of mobs that can be spawned from this spawner.
+	 *  If set to -1, will reset the spawner to the default configured limit. */
+	void setLimit(int value);
 
-	/**
-	 * Empties this spawner, removing the currently spawned mob from it.
-	 * If the spawner wasn't already empty, plays a fizzle animation.
-	 */
+	/** Returns the amount of remaining mobs to be spawned from this spawner. */
+	default int getRemaining() { return Math.max(0, getLimit() - getSpawned()); }
+
+	/** Gets the type of entity spawned from this spawner.
+	 *  Returns null if empty or type can't be determined. */
+	@Nullable EntityType<?> getSpawnedEntityType();
+
+	/** Sets the type of entity spawned from this spawner. */
+	void setSpawnedEntityType(@Nullable EntityType<?> value);
+
+	/** Empties this spawner, removing the currently spawned mob from it.
+	 *  If the spawner wasn't already empty, plays a fizzle animation. */
 	void clear();
 }
