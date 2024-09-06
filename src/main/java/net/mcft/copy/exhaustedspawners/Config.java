@@ -12,8 +12,8 @@ public class Config {
 
 	public static final String CATEGORY_SPAWNER = "spawner";
 	public static ForgeConfigSpec.IntValue SPAWN_LIMIT;
-	public static ForgeConfigSpec.DoubleValue SPAWNER_HARDNESS;
 	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
+	public static ForgeConfigSpec.DoubleValue SPAWNER_BREAK_SPEED;
 
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
@@ -33,14 +33,15 @@ public class Config {
 				"Set to 0 to disable, making spawners work like normal.",
 				"(Default: 64)")
 			.defineInRange("spawn_limit", 64, 0, Integer.MAX_VALUE);
-		SPAWNER_HARDNESS = common.comment(
-				"Controls how long a spawner takes to break.",
-				"(Default: 5.0)")
-			.defineInRange("hardness", 5.0, 0.0, Double.POSITIVE_INFINITY);
 		SPAWNER_SILK_TOUCH = common.comment(
 				"Whether a spawner can be retrieved using Silk Touch enchantment.",
 				"(Default: true)")
 			.define("silk_touch", true);
+		SPAWNER_BREAK_SPEED = common.comment(
+				"Multiplies the time it takes to break a spawner by this value.",
+				"For example, a value of 0.1 would make it take 10 times as long to break.",
+				"(Default: 1.0)")
+			.defineInRange("break_speed", 1.0, 0.0, Double.POSITIVE_INFINITY);
 		common.pop();
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);

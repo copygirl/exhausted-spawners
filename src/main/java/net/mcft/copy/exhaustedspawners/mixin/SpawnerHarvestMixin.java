@@ -14,27 +14,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SpawnerBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeHooks;
 
 @Mixin(SpawnerBlock.class)
 @ParametersAreNonnullByDefault
 public abstract class SpawnerHarvestMixin extends Block {
 	private SpawnerHarvestMixin(Properties properties) { super(properties); }
-
-	@Override
-	public float getDestroyProgress(BlockState state, Player player, BlockGetter block, BlockPos pos) {
-		// Override the default hardness with the one in our config.
-		var hardness   = Config.SPAWNER_HARDNESS.get().floatValue();
-		var multiplier = ForgeHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
-		return player.getDigSpeed(state, pos) / hardness / multiplier;
-	}
 
 	@Override
 	public void playerDestroy(
