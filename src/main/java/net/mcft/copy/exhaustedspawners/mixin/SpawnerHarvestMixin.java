@@ -1,15 +1,14 @@
 package net.mcft.copy.exhaustedspawners.mixin;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.mcft.copy.exhaustedspawners.Config;
-import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -26,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
 
 @Mixin(SpawnerBlock.class)
+@ParametersAreNonnullByDefault
 public abstract class SpawnerHarvestMixin extends Block {
 	private SpawnerHarvestMixin(Properties properties) { super(properties); }
 
