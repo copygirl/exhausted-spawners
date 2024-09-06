@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import net.mcft.copy.exhaustedspawners.Config;
 import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.core.BlockPos;

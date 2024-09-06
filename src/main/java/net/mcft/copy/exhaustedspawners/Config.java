@@ -3,7 +3,6 @@ package net.mcft.copy.exhaustedspawners;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 

@@ -2,9 +2,7 @@ package net.mcft.copy.exhaustedspawners;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import net.mcft.copy.exhaustedspawners.event.SpawnerEventHandler;
-
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
