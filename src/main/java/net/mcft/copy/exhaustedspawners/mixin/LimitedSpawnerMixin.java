@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.mcft.copy.exhaustedspawners.Config;
-import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
 import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -57,8 +56,6 @@ public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 
 		spawned++; // Increase number of mobs spawned so far.
 		if (getRemaining() <= 0) clear(); // Empty, so fizzle!
-
-		ExhaustedSpawners.LOGGER.info("SPAWN! spawned={}, limit={}", spawned, limit);
 	}
 
 	@ModifyVariable(method = "serverTick", at = @At("STORE"))

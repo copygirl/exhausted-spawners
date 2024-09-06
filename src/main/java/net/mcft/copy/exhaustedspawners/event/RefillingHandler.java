@@ -1,7 +1,6 @@
 package net.mcft.copy.exhaustedspawners.event;
 
 import net.mcft.copy.exhaustedspawners.Config;
-import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
 import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.SpawnEggItem;
@@ -52,10 +51,8 @@ public class RefillingHandler {
 				if (isEmpty) {
 					spawner.setSpawnedEntityType(eggType);
 					spawner.setLimit(spawned + charge);
-					ExhaustedSpawners.LOGGER.info("EMPTY! spawned={}, limit={}", spawner.getSpawned(), spawner.getLimit());
 				} else {
 					spawner.setLimit(limit + charge);
-					ExhaustedSpawners.LOGGER.info("REFILL! spawned={}, limit={}", spawner.getSpawned(), spawner.getLimit());
 				}
 
 				player.awardStat(Stats.ITEM_USED.get(eggItem));
