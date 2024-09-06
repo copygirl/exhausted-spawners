@@ -4,6 +4,7 @@ import net.mcft.copy.exhaustedspawners.Config;
 import net.mcft.copy.exhaustedspawners.api.ILimitedSpawner;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.SpawnerBlock;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
@@ -42,22 +43,37 @@ public class RefillingHandler {
 			var spawnType = spawner.getSpawnedEntityType();
 			var eggType   = eggItem.getType(heldStack.getTag());
 
-			var charge  = Config.AMOUNT_REFILLED.get().intValue();
-			var spawned = spawner.getSpawned();
-			var limit   = spawner.getLimit();
+			var refill = Config.AMOUNT_REFILLED.get().intValue();
+			if ((refill > 0) && (isEmpty || (spawnType == eggType))) {
 
-			if ((charge > 0) && (isEmpty || (spawnType == eggType))) {
+				var configurated_limit = Config.SPAWN_LIMIT.get().intValue();
+				var overfill_behavior  = Config.OVERFILL_BEHAVIOR.get();
+				var spawned = spawner.getSpawned();
+				var limit   = spawner.getLimit();
+
+				var remaining  = !isEmpty ? spawner.getRemaining() : 0;
+				var over_limit = (remaining + refill) - configurated_limit;
 
 				if (isEmpty) {
 					spawner.setSpawnedEntityType(eggType);
-					spawner.setLimit(spawned + charge);
-				} else {
-					spawner.setLimit(limit + charge);
-				}
+					limit = spawned;
+				} else if (over_limit > 0)
+					switch (overfill_behavior) {
+						case DENY   : refill = 0; break;
+						case FIZZLE : refill -= over_limit; break;
+						case ALLOW  : over_limit = 0; break;
+					}
 
-				player.awardStat(Stats.ITEM_USED.get(eggItem));
-				player.swing(event.getHand());
-				heldStack.shrink(1);
+				if (refill > 0) {
+					spawner.setLimit(limit + refill);
+
+					// If we went over the limit, play a fizzle animation at the spawner.
+					if (over_limit > 0) level.levelEvent(LevelEvent.LAVA_FIZZ, pos, 0);
+
+					player.awardStat(Stats.ITEM_USED.get(eggItem));
+					player.swing(event.getHand());
+					heldStack.shrink(1);
+				}
 			}
 
 			event.setCanceled(true);

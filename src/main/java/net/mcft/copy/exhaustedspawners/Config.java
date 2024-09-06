@@ -3,6 +3,7 @@ package net.mcft.copy.exhaustedspawners;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import net.mcft.copy.exhaustedspawners.event.OverfillBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -17,6 +18,7 @@ public class Config {
 
 	public static final String CATEGORY_REFILLING = "refilling";
 	public static ForgeConfigSpec.IntValue AMOUNT_REFILLED;
+	public static ForgeConfigSpec.EnumValue<OverfillBehavior> OVERFILL_BEHAVIOR;
 
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
@@ -56,6 +58,13 @@ public class Config {
 				"Keep drop chances lower than 1 / this value, or you can end up with a positive feedback loop.",
 				"(Default: 16)")
 			.defineInRange("amount_refilled", 16, 0, Integer.MAX_VALUE);
+		OVERFILL_BEHAVIOR = common.comment(
+				"What happens when refilling a spawner beyond 'spawn_limit':",
+				"  DENY   = You are prevented from doing so.",
+				"  FIZZLE = Any additional spawns are lost.",
+				"  ALLOW  = To infinity, and beyond!",
+				"(Default: \"FIZZLE\")")
+			.defineEnum("overfill_behavior", OverfillBehavior.FIZZLE);
 		common.pop();
 
 		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);
