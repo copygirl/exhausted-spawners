@@ -33,7 +33,7 @@ public class SpawnEggDropHandler {
 				.toList();
 	}
 
-	/** Clears any items from the drops collection that weren't part of the entity's equipment. */
+	/** Clears any items from drops that weren't part of the entity's equipment. */
 	private void clearNonEquipment(Collection<ItemEntity> drops) {
 		drops.removeIf(itemEntity -> !capturedEquipment.contains(itemEntity.getItem()));
 	}
@@ -57,16 +57,15 @@ public class SpawnEggDropHandler {
 		// If not using a silk touch item, multiply drop chance by non-silktouch modifier.
 		if (!silkTouch) chance *= Config.EGG_DROP_NON_SILK_TOUCH_MODIFIER.get();
 
-		var entity = event.getEntity();
-
 		// If a silk touch item is used, and drops should be cleared when using silk touch, do that.
 		if (silkTouch && Config.CLEAR_DROPS_ON_SILK_TOUCH.get()) clearNonEquipment(event.getDrops());
 
-		// Check if RNGesus is with us this day.
-		if (entity.getRandom().nextFloat() >= chance) return;
-
+		var entity     = event.getEntity();
 		var entityType = entity.getType();
 		var entityId   = EntityType.getKey(entityType);
+
+		// Check if RNGesus is with us this day.
+		if (entity.getRandom().nextFloat() >= chance) return;
 
 		// If entity id is contained in blacklist, don't drop anything.
 		if (Config.EGG_DROP_BLACKLIST.get().contains(entityId.toString())) return;
