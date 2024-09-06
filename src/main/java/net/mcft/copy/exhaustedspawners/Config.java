@@ -35,6 +35,8 @@ public class Config {
 			.defineInRange("spawn_limit", 64, 0, Integer.MAX_VALUE);
 		SPAWNER_SILK_TOUCH = common.comment(
 				"Whether a spawner can be retrieved using Silk Touch enchantment.",
+				"This also prevents spawners from dropping experience when silk-touched.",
+				"Spawner drops are controlled by a loot table, which can be overridden.",
 				"(Default: true)")
 			.define("silk_touch", true);
 		SPAWNER_BREAK_SPEED = common.comment(
