@@ -12,7 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber
-public class RefillingHandler {
+public class SpawnerRefillingHandler {
 
 	@SubscribeEvent
 	public void onRightClickBlockEvent(RightClickBlock event) {

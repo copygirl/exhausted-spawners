@@ -51,7 +51,7 @@ public class Config {
 			.defineInRange("break_speed", 1.0, 0.0, Double.POSITIVE_INFINITY);
 		common.pop();
 
-		common.comment("Refilling Settings").push(CATEGORY_REFILLING);
+		common.comment("Spawner Refilling Settings").push(CATEGORY_REFILLING);
 		AMOUNT_REFILLED = common.comment(
 				"Amount of mobs a spawner is recharged with when a spawn egg is used on it.",
 				"Requires the spawner to be empty or to already be spawning the same mob type.",

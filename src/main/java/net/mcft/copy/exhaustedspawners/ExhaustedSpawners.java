@@ -3,7 +3,7 @@ package net.mcft.copy.exhaustedspawners;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.mcft.copy.exhaustedspawners.event.RefillingHandler;
+import net.mcft.copy.exhaustedspawners.event.SpawnerRefillingHandler;
 import net.mcft.copy.exhaustedspawners.event.SpawnEggDropHandler;
 import net.mcft.copy.exhaustedspawners.event.SpawnerHarvestHandler;
 import net.mcft.copy.exhaustedspawners.loot.LootConditions;
@@ -27,7 +27,7 @@ public class ExhaustedSpawners {
 
 		var forgeEventBus = MinecraftForge.EVENT_BUS;
 		forgeEventBus.register(new SpawnerHarvestHandler());
-		forgeEventBus.register(new RefillingHandler());
+		forgeEventBus.register(new SpawnerRefillingHandler());
 		forgeEventBus.register(new SpawnEggDropHandler());
 	}
 }
