@@ -18,7 +18,7 @@ public class Config {
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
 	public static ForgeConfigSpec.DoubleValue EGG_DROP_LOOTING_BONUS;
-	public static ForgeConfigSpec.DoubleValue EGG_DROP_NON_SILK_TOUCH_MODIFIER;
+	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE_SILK_TOUCH;
 	public static ForgeConfigSpec.BooleanValue PLAYER_KILL_REQUIRED;
 	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_EGG;
 	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_SILK_TOUCH;
@@ -50,17 +50,15 @@ public class Config {
 				"(Default: 0.03)")
 			.defineInRange("drop_chance", 0.03, 0.0, 1.0);
 		EGG_DROP_LOOTING_BONUS = common.comment(
-				"Increases drop chance by this value for each effective looting level.",
+				"Increases drop chance by this value for each effective Looting level.",
 				"(Default: 0.01)")
 			.defineInRange("looting_bonus", 0.01, 0.0, 1.0);
-		EGG_DROP_NON_SILK_TOUCH_MODIFIER = common.comment(
-				"Drop chance multiplayer when an item without Silk Touch is used.",
-				"Applied after looting bonus. Can be set to 0.0 to require Silk Touch.",
+		EGG_DROP_CHANCE_SILK_TOUCH = common.comment(
+				"Chance for a mob to drop its spawn egg when killed with Silk Touch.",
+				"Replaces 'drop_chance' entirely and is incompatible with Looting.",
 				"To have weapons be enchantable with Silk Touch, use Forgery's 'weapons_accept_silk' tweak.",
-				"Example: drop_chance=0.2, non_silk_touch_modifier=0.025 will result in items",
-				"         with silk touch having 20% chance, while without having a 0.5% chance.",
-				"(Default: 1.0)")
-			.defineInRange("non_silk_touch_modifier", 1.0, 0.0, 1.0);
+				"(Default: 0.0)")
+			.defineInRange("drop_chance_silk_touch", 1.0, 0.0, 1.0);
 		PLAYER_KILL_REQUIRED = common.comment(
 				"Whether a player kill is required for mobs to drop their spawn egg.",
 				"Note: Some automation mods can fill this requirement using a fake player.",

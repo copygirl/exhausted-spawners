@@ -40,22 +40,18 @@ public class SpawnEggDropHandler {
 
 	@SubscribeEvent
 	public void onLivingDropsEvent(LivingDropsEvent event) {
-		var chance = Config.EGG_DROP_CHANCE.get().doubleValue();
-		if (chance <= 0.0) return; // Functionality is disabled.
-
 		var killer = event.getSource().getEntity();
 		var causedByPlayer = killer instanceof Player;
 		if (Config.PLAYER_KILL_REQUIRED.get() && !causedByPlayer) return;
 
-		// Apply looting bonus to drop chance.
-		chance += event.getLootingLevel() * Config.EGG_DROP_LOOTING_BONUS.get();
-
 		// TODO: Technically incorrect, but there might not be a way to get the actual item used for the kill.
-		var killerItem = (killer instanceof LivingEntity) ? ((LivingEntity)killer).getMainHandItem() : ItemStack.EMPTY;
-		var silkTouch  = killerItem.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0;
+		var weapon    = (killer instanceof LivingEntity) ? ((LivingEntity)killer).getMainHandItem() : ItemStack.EMPTY;
+		var silkTouch = weapon.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0;
+		var looting   = event.getLootingLevel(); // Has other looting bonuses applied.
 
-		// If not using a silk touch item, multiply drop chance by non-silktouch modifier.
-		if (!silkTouch) chance *= Config.EGG_DROP_NON_SILK_TOUCH_MODIFIER.get();
+		var chance = silkTouch
+			? Config.EGG_DROP_CHANCE_SILK_TOUCH.get()
+			: Config.EGG_DROP_CHANCE.get() + looting * Config.EGG_DROP_LOOTING_BONUS.get();
 
 		// If a silk touch item is used, and drops should be cleared when using silk touch, do that.
 		if (silkTouch && Config.CLEAR_DROPS_ON_SILK_TOUCH.get()) clearNonEquipment(event.getDrops());
@@ -73,9 +69,10 @@ public class SpawnEggDropHandler {
 		var spawnEgg = ForgeSpawnEggItem.fromEntityType(entityType);
 		if (spawnEgg == null) return; // No spawn egg found.
 
-		// If mob drops should be cleared when a spawn egg is dropped, do that.
+		// If drops should be cleared when a spawn egg is dropped, do that.
 		if (Config.CLEAR_DROPS_ON_EGG.get()) clearNonEquipment(event.getDrops());
 
+		// Add spawn egg to the drops where the entity died.
 		event.getDrops().add(new ItemEntity(entity.level(),
 				entity.getX(), entity.getY(), entity.getZ(),
 				new ItemStack(spawnEgg)));
