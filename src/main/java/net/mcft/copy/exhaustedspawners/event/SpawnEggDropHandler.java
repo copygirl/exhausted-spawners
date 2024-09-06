@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import net.mcft.copy.exhaustedspawners.Config;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,7 +65,13 @@ public class SpawnEggDropHandler {
 		if (entity.getRandom().nextFloat() >= chance) return;
 
 		// If entity id is contained in blacklist, don't drop anything.
-		if (Config.EGG_DROP_BLACKLIST.get().contains(entityId.toString())) return;
+		var blacklist = Config.EGG_DROP_BLACKLIST.get();
+		if (blacklist.contains(entityId.toString())) return;
+
+		// If any of the entity's type's tags are contained in the blacklist, don't drop anything.
+		var blacklistTags = blacklist.stream().filter(i -> i.startsWith("#")).map(i -> i.substring(1)).toList();
+		var entityTags    = entityType.getTags().map(TagKey::location).map(Object::toString);
+		if (entityTags.anyMatch(blacklistTags::contains)) return;
 
 		var spawnEgg = ForgeSpawnEggItem.fromEntityType(entityType);
 		if (spawnEgg == null) return; // No spawn egg found.

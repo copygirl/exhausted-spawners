@@ -73,12 +73,19 @@ public class Config {
 				"(Default: false)")
 			.define("clear_drops_on_silk_touch", false);
 		EGG_DROP_BLACKLIST = common.comment(
-				"Blacklist of mobs that should not drop their spawn eggs when killed.",
-				"Example: [\"minecraft:creeper\", \"minecraft:ghast\"]",
+				"Blacklist of mobs (ids and tags) that should not drop their spawn eggs when killed.",
+				"Example: [\"minecraft:creeper\", \"minecraft:ghast\", \"#minecraft:illager\"]",
 				"(Default: [])")
-			.defineList("drop_blacklist", ImmutableList.of(), obj -> ResourceLocation.isValidResourceLocation((String)obj));
+			.defineList("drop_blacklist", ImmutableList.of(), Config::isValidIdentifierOrTag);
 		common.pop();
 
 		COMMON_CONFIG = common.build();
+	}
+
+	private static boolean isValidIdentifierOrTag(Object obj) {
+		if (!(obj instanceof String)) return false;
+		var str = (String)obj;
+		if (str.startsWith("#")) str = str.substring(1);
+		return ResourceLocation.isValidResourceLocation(str);
 	}
 }
