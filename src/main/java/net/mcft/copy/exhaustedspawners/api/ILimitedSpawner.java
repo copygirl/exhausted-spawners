@@ -1,5 +1,7 @@
 package net.mcft.copy.exhaustedspawners.api;
 
+import net.mcft.copy.exhaustedspawners.ExhaustedSpawners;
+
 /**
  * Implemented by BaseSpawner using a mixin.
  * Does nothing meaningful on the client.
@@ -7,7 +9,7 @@ package net.mcft.copy.exhaustedspawners.api;
 public interface ILimitedSpawner {
 
 	/** The NBT key used to save/load the number of spawned mobs. */
-	static final String SPAWNED_NBT_KEY = "exhaustedspawners:spawned";
+	static final String SPAWNED_NBT_KEY = ExhaustedSpawners.MOD_ID + ":spawned";
 
 	/**
 	 * Returns the configurated limit of mobs that can be spawned before
