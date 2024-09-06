@@ -47,18 +47,18 @@ public class Config {
 		EGG_DROP_CHANCE = common.comment(
 				"Chance for a mob to drop its spawn egg when killed.",
 				"Set to 0.0 to disable.",
-				"(Default: 0.03)")
-			.defineInRange("drop_chance", 0.03, 0.0, 1.0);
+				"(Default: 0.002)")
+			.defineInRange("drop_chance", 0.002, 0.0, 1.0);
 		EGG_DROP_LOOTING_BONUS = common.comment(
 				"Increases drop chance by this value for each effective Looting level.",
-				"(Default: 0.01)")
-			.defineInRange("looting_bonus", 0.01, 0.0, 1.0);
+				"(Default: 0.001)")
+			.defineInRange("looting_bonus", 0.001, 0.0, 1.0);
 		EGG_DROP_CHANCE_SILK_TOUCH = common.comment(
 				"Chance for a mob to drop its spawn egg when killed with Silk Touch.",
 				"Replaces 'drop_chance' entirely and is incompatible with Looting.",
 				"To have weapons be enchantable with Silk Touch, use Forgery's 'weapons_accept_silk' tweak.",
-				"(Default: 0.0)")
-			.defineInRange("drop_chance_silk_touch", 1.0, 0.0, 1.0);
+				"(Default: 0.05)")
+			.defineInRange("drop_chance_silk_touch", 0.1, 0.0, 1.0);
 		PLAYER_KILL_REQUIRED = common.comment(
 				"Whether a player kill is required for mobs to drop their spawn egg.",
 				"Note: Some automation mods can fill this requirement using a fake player.",
@@ -70,8 +70,8 @@ public class Config {
 			.define("clear_drops_on_egg", false);
 		CLEAR_DROPS_ON_SILK_TOUCH = common.comment(
 				"Whether to always clear mob drops (except equipment) when a Silk Touch item is used.",
-				"(Default: false)")
-			.define("clear_drops_on_silk_touch", false);
+				"(Default: true)")
+			.define("clear_drops_on_silk_touch", true);
 		EGG_DROP_BLACKLIST = common.comment(
 				"Blacklist of mobs (ids and tags) that should not drop their spawn eggs when killed.",
 				"Example: [\"minecraft:creeper\", \"minecraft:ghast\", \"#minecraft:illager\"]",
