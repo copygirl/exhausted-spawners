@@ -61,6 +61,9 @@ public class SpawnEggDropHandler {
 		var entityType = entity.getType();
 		var entityId   = EntityType.getKey(entityType);
 
+		// Babies don't drop spawn eggs without silk touch.
+		if (!silkTouch && entity.isBaby()) return;
+
 		// Check if RNGesus is with us this day.
 		if (entity.getRandom().nextFloat() >= chance) return;
 
