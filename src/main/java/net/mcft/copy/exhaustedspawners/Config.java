@@ -18,6 +18,9 @@ public class Config {
 	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
 	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_DROP_CHANCE;
 	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_PLAYER_KILL_REQUIRED;
+	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_EGG;
+	public static ForgeConfigSpec.BooleanValue SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH;
+	public static ForgeConfigSpec.DoubleValue SPAWN_EGG_NON_SILK_TOUCH_MODIFIER;
 	public static ForgeConfigSpec.ConfigValue<List<? extends String>> SPAWN_EGG_DROP_BLACKLIST;
 
 	static {
@@ -42,6 +45,15 @@ public class Config {
 		SPAWN_EGG_PLAYER_KILL_REQUIRED = common
 			.comment("Whether a player kill is required for mobs to drop their spawn egg. (Default: true)")
 			.define("player_kill_required", true);
+		SPAWN_EGG_CLEAR_DROPS_WHEN_EGG = common
+			.comment("Whether to clear any other mob drops when a spawn egg is dropped. (Default: false)")
+			.define("clear_drops_when_egg", false);
+		SPAWN_EGG_CLEAR_DROPS_WHEN_SILK_TOUCH = common
+			.comment("Whether to always clear drops when a Silk Touch is used to kill the mob. (Default: false)")
+			.define("clear_drops_when_silk_touch", false);
+		SPAWN_EGG_NON_SILK_TOUCH_MODIFIER = common
+			.comment("Drop chance multiplayer when an item without silk touch is used. (Default: 1.0)")
+			.defineInRange("non_silk_touch_modifier", 1.0, 0.0, 1.0);
 		SPAWN_EGG_DROP_BLACKLIST = common
 			.comment("Blacklist of mobs that should not drop their spawn eggs when killed. (Default: [])")
 			.defineList("drop_blacklist", ImmutableList.of(), obj -> ResourceLocation.isValidResourceLocation((String)obj));
