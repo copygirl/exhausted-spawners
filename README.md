@@ -1,4 +1,4 @@
-# Exhausted Monster Spawners
+# Exhausted Spawners
 
 .. is a [Forge] mod for Minecraft 1.20.1 primarily for limiting the number of
 mobs created by a monster spawner, introducing other ways to recharge them,
