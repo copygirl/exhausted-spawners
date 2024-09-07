@@ -57,8 +57,8 @@ public class Config {
 				"Amount of mobs a spawner is recharged with when a spawn egg is used on it.",
 				"Requires the spawner to be empty or to already be spawning the same mob type.",
 				"Keep drop chances lower than '1 / amount_refilled', or you can end up with a positive feedback loop.",
-				"Default: 16")
-			.defineInRange("amount_refilled", 16, 0, Integer.MAX_VALUE);
+				"Default: 4")
+			.defineInRange("amount_refilled", 4, 0, Integer.MAX_VALUE);
 		OVERFILL_BEHAVIOR = common.comment(
 				"What happens when refilling a spawner beyond 'spawn_limit':",
 				"  DENY   = You are prevented from doing so.",
@@ -83,8 +83,8 @@ public class Config {
 		DROP_CHANCE_PER_EGG_SILK_TOUCH = common.comment(
 				"When breaking a spawner with silk touch, each spawn egg",
 				"worth of mobs remaining in it has this chance to drop.",
-				"Default: 0.75")
-			.defineInRange("drop_chance_per_egg_silk_touch", 0.75, 0.0, 1.0);
+				"Default: 0.8")
+			.defineInRange("drop_chance_per_egg_silk_touch", 0.8, 0.0, 1.0);
 		XP_BASE = common.comment(
 				"Amount of experience dropped when breaking a spawner, if not silk-touched.",
 				"The following formula is used to determine the actual amount of xp to drop:",
@@ -105,18 +105,18 @@ public class Config {
 		common.comment("Spawn Egg Loot Settings").push(CATEGORY_SPAWN_EGG_LOOT);
 		DROP_CHANCE = common.comment(
 				"Chance for a mob to drop its spawn egg when killed.",
-				"Default: 0.002")
-			.defineInRange("drop_chance", 0.002, 0.0, 1.0);
+				"Default: 0.0")
+			.defineInRange("drop_chance", 0.0, 0.0, 1.0);
 		DROP_LOOTING_BONUS = common.comment(
 				"Increases drop chance by this value for each effective Looting level.",
-				"Default: 0.001")
-			.defineInRange("looting_bonus", 0.001, 0.0, 1.0);
+				"Default: 0.0")
+			.defineInRange("looting_bonus", 0.0, 0.0, 1.0);
 		DROP_CHANCE_SILK_TOUCH = common.comment(
 				"Chance for a mob to drop its spawn egg when killed with Silk Touch.",
 				"Replaces 'drop_chance' entirely and is incompatible with Looting.",
 				"To have weapons be enchantable with Silk Touch, use Forgery's 'weapons_accept_silk' tweak.",
-				"Default: 0.05")
-			.defineInRange("drop_chance_silk_touch", 0.1, 0.0, 1.0);
+				"Default: 0.15")
+			.defineInRange("drop_chance_silk_touch", 0.15, 0.0, 1.0);
 		PLAYER_KILL_REQUIRED = common.comment(
 				"Whether a player kill is required for mobs to drop their spawn egg.",
 				"Note: Some automation mods can fill this requirement using a fake player.",
