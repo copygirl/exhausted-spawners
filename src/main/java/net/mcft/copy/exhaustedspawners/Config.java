@@ -16,25 +16,25 @@ public class Config {
 	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
 	public static ForgeConfigSpec.DoubleValue SPAWNER_BREAK_SPEED;
 
-	public static final String CATEGORY_REFILLING = "refilling";
+	public static final String CATEGORY_REFILLING = "spawner_refilling";
 	public static ForgeConfigSpec.IntValue AMOUNT_REFILLED;
 	public static ForgeConfigSpec.EnumValue<OverfillBehavior> OVERFILL_BEHAVIOR;
 
-	public static final String CATEGORY_SPAWN_EGGS = "spawn_eggs";
-	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE;
-	public static ForgeConfigSpec.DoubleValue EGG_DROP_LOOTING_BONUS;
-	public static ForgeConfigSpec.DoubleValue EGG_DROP_CHANCE_SILK_TOUCH;
+	public static final String CATEGORY_SPAWN_EGG_LOOT = "spawn_egg_loot";
+	public static ForgeConfigSpec.DoubleValue DROP_CHANCE;
+	public static ForgeConfigSpec.DoubleValue DROP_LOOTING_BONUS;
+	public static ForgeConfigSpec.DoubleValue DROP_CHANCE_SILK_TOUCH;
 	public static ForgeConfigSpec.BooleanValue PLAYER_KILL_REQUIRED;
 	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_EGG;
 	public static ForgeConfigSpec.BooleanValue CLEAR_DROPS_ON_SILK_TOUCH;
-	public static ForgeConfigSpec.ConfigValue<List<? extends String>> EGG_DROP_BLACKLIST;
+	public static ForgeConfigSpec.ConfigValue<List<? extends String>> DROP_EXCLUDE_LIST;
 
 	static {
 		var common = new ForgeConfigSpec.Builder();
 
 		common.comment("Monster Spawner Settings").push(CATEGORY_SPAWNER);
 		SPAWN_LIMIT = common.comment(
-				"Amount of mobs spawned before spawner becomes inactive.",
+				"Amount of mobs spawned before spawner empties and becomes inactive.",
 				"Set to 0 to disable, making spawners work like normal.",
 				"(Default: 64)")
 			.defineInRange("spawn_limit", 64, 0, Integer.MAX_VALUE);
@@ -55,7 +55,7 @@ public class Config {
 		AMOUNT_REFILLED = common.comment(
 				"Amount of mobs a spawner is recharged with when a spawn egg is used on it.",
 				"Requires the spawner to be empty or to already be spawning the same mob type.",
-				"Keep drop chances lower than 1 / this value, or you can end up with a positive feedback loop.",
+				"Keep drop chances lower than '1 / amount_refilled', or you can end up with a positive feedback loop.",
 				"(Default: 16)")
 			.defineInRange("amount_refilled", 16, 0, Integer.MAX_VALUE);
 		OVERFILL_BEHAVIOR = common.comment(
@@ -67,17 +67,16 @@ public class Config {
 			.defineEnum("overfill_behavior", OverfillBehavior.FIZZLE);
 		common.pop();
 
-		common.comment("Spawn Egg Settings").push(CATEGORY_SPAWN_EGGS);
-		EGG_DROP_CHANCE = common.comment(
+		common.comment("Spawn Egg Loot Settings").push(CATEGORY_SPAWN_EGG_LOOT);
+		DROP_CHANCE = common.comment(
 				"Chance for a mob to drop its spawn egg when killed.",
-				"Set to 0.0 to disable.",
 				"(Default: 0.002)")
 			.defineInRange("drop_chance", 0.002, 0.0, 1.0);
-		EGG_DROP_LOOTING_BONUS = common.comment(
+		DROP_LOOTING_BONUS = common.comment(
 				"Increases drop chance by this value for each effective Looting level.",
 				"(Default: 0.001)")
 			.defineInRange("looting_bonus", 0.001, 0.0, 1.0);
-		EGG_DROP_CHANCE_SILK_TOUCH = common.comment(
+		DROP_CHANCE_SILK_TOUCH = common.comment(
 				"Chance for a mob to drop its spawn egg when killed with Silk Touch.",
 				"Replaces 'drop_chance' entirely and is incompatible with Looting.",
 				"To have weapons be enchantable with Silk Touch, use Forgery's 'weapons_accept_silk' tweak.",
@@ -96,11 +95,11 @@ public class Config {
 				"Whether to always clear mob drops (except equipment) when a Silk Touch item is used.",
 				"(Default: true)")
 			.define("clear_drops_on_silk_touch", true);
-		EGG_DROP_BLACKLIST = common.comment(
-				"Blacklist of mobs (ids and tags) that should not drop their spawn eggs when killed.",
+		DROP_EXCLUDE_LIST = common.comment(
+				"List of mobs (ids and tags) that should not drop their spawn eggs when killed.",
 				"Example: [\"minecraft:creeper\", \"minecraft:ghast\", \"#minecraft:illager\"]",
 				"(Default: [])")
-			.defineList("drop_blacklist", ImmutableList.of(), Config::isValidIdentifierOrTag);
+			.defineList("drop_exclude_list", ImmutableList.of(), Config::isValidIdentifierOrTag);
 		common.pop();
 
 		COMMON_CONFIG = common.build();

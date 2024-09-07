@@ -51,8 +51,8 @@ public class SpawnEggDropHandler {
 		var looting   = event.getLootingLevel(); // Has other looting bonuses applied.
 
 		var chance = silkTouch
-			? Config.EGG_DROP_CHANCE_SILK_TOUCH.get()
-			: Config.EGG_DROP_CHANCE.get() + looting * Config.EGG_DROP_LOOTING_BONUS.get();
+			? Config.DROP_CHANCE_SILK_TOUCH.get()
+			: Config.DROP_CHANCE.get() + looting * Config.DROP_LOOTING_BONUS.get();
 
 		// If a silk touch item is used, and drops should be cleared when using silk touch, do that.
 		if (silkTouch && Config.CLEAR_DROPS_ON_SILK_TOUCH.get()) clearNonEquipment(event.getDrops());
@@ -67,14 +67,14 @@ public class SpawnEggDropHandler {
 		// Check if RNGesus is with us this day.
 		if (entity.getRandom().nextFloat() >= chance) return;
 
-		// If entity id is contained in blacklist, don't drop anything.
-		var blacklist = Config.EGG_DROP_BLACKLIST.get();
-		if (blacklist.contains(entityId.toString())) return;
+		// If entity id is contained in exclude-list, don't drop anything.
+		var excludeList = Config.DROP_EXCLUDE_LIST.get();
+		if (excludeList.contains(entityId.toString())) return;
 
-		// If any of the entity's type's tags are contained in the blacklist, don't drop anything.
-		var blacklistTags = blacklist.stream().filter(i -> i.startsWith("#")).map(i -> i.substring(1)).toList();
-		var entityTags    = entityType.getTags().map(TagKey::location).map(Object::toString);
-		if (entityTags.anyMatch(blacklistTags::contains)) return;
+		// If any of the entity type's tags are contained in the exclude-list, don't drop anything.
+		var excludeTags = excludeList.stream().filter(i -> i.startsWith("#")).map(i -> i.substring(1)).toList();
+		var entityTags  = entityType.getTags().map(TagKey::location).map(Object::toString);
+		if (entityTags.anyMatch(excludeTags::contains)) return;
 
 		var spawnEgg = ForgeSpawnEggItem.fromEntityType(entityType);
 		if (spawnEgg == null) return; // No spawn egg found.
