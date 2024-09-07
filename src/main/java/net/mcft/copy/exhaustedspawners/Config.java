@@ -13,12 +13,19 @@ public class Config {
 
 	public static final String CATEGORY_SPAWNER = "spawner";
 	public static ForgeConfigSpec.IntValue SPAWN_LIMIT;
-	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
 	public static ForgeConfigSpec.DoubleValue SPAWNER_BREAK_SPEED;
 
 	public static final String CATEGORY_REFILLING = "spawner_refilling";
 	public static ForgeConfigSpec.IntValue AMOUNT_REFILLED;
 	public static ForgeConfigSpec.EnumValue<OverfillBehavior> OVERFILL_BEHAVIOR;
+
+	public static final String CATEGORY_SPAWNER_LOOT = "spawner_loot";
+	public static ForgeConfigSpec.BooleanValue SPAWNER_SILK_TOUCH;
+	public static ForgeConfigSpec.DoubleValue DROP_CHANCE_PER_EGG;
+	public static ForgeConfigSpec.DoubleValue DROP_CHANCE_PER_EGG_SILK_TOUCH;
+	public static ForgeConfigSpec.IntValue XP_BASE;
+	public static ForgeConfigSpec.IntValue XP_REMAINING_CAP;
+	public static ForgeConfigSpec.DoubleValue XP_PER_REMAINING;
 
 	public static final String CATEGORY_SPAWN_EGG_LOOT = "spawn_egg_loot";
 	public static ForgeConfigSpec.DoubleValue DROP_CHANCE;
@@ -38,12 +45,6 @@ public class Config {
 				"Set to 0 to disable, making spawners work like normal.",
 				"(Default: 64)")
 			.defineInRange("spawn_limit", 64, 0, Integer.MAX_VALUE);
-		SPAWNER_SILK_TOUCH = common.comment(
-				"Whether a spawner can be retrieved using Silk Touch enchantment.",
-				"This also prevents spawners from dropping experience when silk-touched.",
-				"Spawner drops are controlled by a loot table, which can be overridden.",
-				"(Default: true)")
-			.define("silk_touch", true);
 		SPAWNER_BREAK_SPEED = common.comment(
 				"Multiplies the time it takes to break a spawner by this value.",
 				"For example, a value of 0.1 would make it take 10 times as long to break.",
@@ -65,6 +66,40 @@ public class Config {
 				"  ALLOW  = To infinity, and beyond!",
 				"(Default: \"FIZZLE\")")
 			.defineEnum("overfill_behavior", OverfillBehavior.FIZZLE);
+		common.pop();
+
+		common.comment("Spawner Loot Settings").push(CATEGORY_SPAWNER_LOOT);
+		SPAWNER_SILK_TOUCH = common.comment(
+				"Whether a spawner can be retrieved using Silk Touch enchantment.",
+				"This also prevents spawners from dropping experience when silk-touched.",
+				"Spawner drops are controlled by a loot table, which can be overridden.",
+				"(Default: true)")
+			.define("silk_touch", true);
+		DROP_CHANCE_PER_EGG = common.comment(
+				"When breaking a spawner, each spawn egg worth of mobs remaining in it has this chance to drop.",
+				"For each egg dropped, the number of remaining mobs is reduced for the purpose of calculating XP drops.",
+				"(Default: 0.0)")
+			.defineInRange("drop_chance_per_egg", 0.0, 0.0, 1.0);
+		DROP_CHANCE_PER_EGG_SILK_TOUCH = common.comment(
+				"When breaking a spawner with silk touch, each spawn egg",
+				"worth of mobs remaining in it has this chance to drop.",
+				"(Default: 0.75)")
+			.defineInRange("drop_chance_per_egg_silk_touch", 0.75, 0.0, 1.0);
+		XP_BASE = common.comment(
+				"Amount of experience dropped when breaking a spawner, if not silk-touched.",
+				"The following formula is used to determine the actual amount of xp to drop:",
+				"  amount = xp_base + min(xp_remaining_cap, remaining) * xp_per_remaining",
+				"  result = amount + rand(amount) + rand(amount)",
+				"(Default: 10)")
+			.defineInRange("xp_base", 10, 0, Integer.MAX_VALUE);
+		XP_REMAINING_CAP = common.comment(
+				"Number of remaining mobs is capped to this value for the purposes of calculating XP drops.",
+				"(Default: 20)")
+			.defineInRange("xp_remaining_cap", 20, 0, Integer.MAX_VALUE);
+		XP_PER_REMAINING = common.comment(
+				"Experience dropped for each remaining mob in the spawner when broken.",
+				"(Default: 0.5)")
+			.defineInRange("xp_per_remaining", 0.5, 0.0, Double.POSITIVE_INFINITY);
 		common.pop();
 
 		common.comment("Spawn Egg Loot Settings").push(CATEGORY_SPAWN_EGG_LOOT);

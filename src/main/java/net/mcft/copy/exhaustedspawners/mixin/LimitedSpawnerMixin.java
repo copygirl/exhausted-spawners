@@ -48,11 +48,11 @@ public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 	@Inject(method = "serverTick", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/server/level/ServerLevel;levelEvent(ILnet/minecraft/core/BlockPos;I)V"))
 	private void onEntitySpawned(ServerLevel level, BlockPos pos, CallbackInfo ci) {
-		var configured_limit = Config.SPAWN_LIMIT.get();
-		if (configured_limit == 0) return; // Functionality disabled.
+		var configLimit = Config.SPAWN_LIMIT.get();
+		if (configLimit == 0) return; // Functionality disabled.
 
 		// If limit is unset, set it to the configured limit.
-		if (limit < 0) setLimit(spawned + configured_limit);
+		if (limit < 0) setLimit(spawned + configLimit);
 
 		spawned++; // Increase number of mobs spawned so far.
 		if (getRemaining() <= 0) clear(); // Empty, so fizzle!
@@ -67,24 +67,26 @@ public abstract class LimitedSpawnerMixin implements ILimitedSpawner {
 	// ILimitedSpawner implementation
 
 	@Override
-	public boolean isEmpty() {
-		if (nextSpawnData == null) return true;
-		if (!nextSpawnData.entityToSpawn().contains("id", 8)) return true;
-		return getRemaining() <= 0;
-	}
-
-	@Override
 	public int getSpawned() { return spawned; }
 
 	@Override
 	public int getLimit() {
-		var configured_limit = Config.SPAWN_LIMIT.get();
-		if (configured_limit <= 0) return Integer.MAX_VALUE;
-		return (limit >= 0) ? limit : spawned + configured_limit;
+		var configLimit = Config.SPAWN_LIMIT.get();
+		if (configLimit <= 0) return Integer.MAX_VALUE;
+		return (limit >= 0) ? limit : spawned + configLimit;
 	}
 
 	@Override
 	public void setLimit(int value) { limit = value; }
+
+	@Override
+	public int getRemaining() {
+		if (getSpawnedEntityType() == null) return 0;
+		var configLimit = Config.SPAWN_LIMIT.get();
+		if (configLimit <= 0) return Integer.MAX_VALUE;
+		return (limit >= 0) ? Math.max(0, limit - spawned)
+		                    : configLimit;
+	}
 
 	@Override
 	@Nullable

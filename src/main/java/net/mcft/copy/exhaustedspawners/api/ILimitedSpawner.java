@@ -15,9 +15,6 @@ public interface ILimitedSpawner {
 	static final String SPAWNED_NBT_KEY = ExhaustedSpawners.MOD_ID + ":spawned";
 	static final String LIMIT_NBT_KEY   = ExhaustedSpawners.MOD_ID + ":limit";
 
-	/** Returns if this spawner is empty and can't spawn any more mobs. */
-	boolean isEmpty();
-
 	/** Gets how many mobs this spawner has spawned total. */
 	int getSpawned();
 
@@ -29,7 +26,7 @@ public interface ILimitedSpawner {
 	void setLimit(int value);
 
 	/** Returns the amount of remaining mobs to be spawned from this spawner. */
-	default int getRemaining() { return Math.max(0, getLimit() - getSpawned()); }
+	int getRemaining();
 
 	/** Gets the type of entity spawned from this spawner.
 	 *  Returns null if empty or type can't be determined. */
