@@ -51,6 +51,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
+
+    implementation fg.deobf("maven.modrinth:jade:${jade_version}+forge")
 }
 
 mixin {
@@ -70,10 +72,9 @@ mixin {
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.named("processResources", ProcessResources).configure {
     var replaceProperties = [
-        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
         loader_version_range: loader_version_range,
         forge_version_range: forge_version_range,
-        forge_version: forge_version,
+        jade_version_range: jade_version_range,
 
         mod_id: mod_id, mod_name: mod_name, mod_url: mod_url,
         mod_license: mod_license, mod_version: mod_version,
