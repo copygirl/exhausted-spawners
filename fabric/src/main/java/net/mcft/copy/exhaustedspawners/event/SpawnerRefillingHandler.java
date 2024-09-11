@@ -9,8 +9,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.SpawnerBlock;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -31,7 +31,7 @@ public final class SpawnerRefillingHandler {
 
 		var pos   = ((BlockHitResult)hit).getBlockPos();
 		var block = level.getBlockState(pos).getBlock();
-		if (!(block instanceof SpawnerBlock)) return InteractionResult.PASS;
+		if (block != Blocks.SPAWNER) return InteractionResult.PASS;
 
 		var heldStack = player.getItemInHand(hand);
 		if (!(heldStack.getItem() instanceof SpawnEggItem)) return InteractionResult.PASS;

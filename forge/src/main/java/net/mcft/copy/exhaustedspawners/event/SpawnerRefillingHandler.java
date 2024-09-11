@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.SpawnerBlock;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
@@ -27,7 +27,7 @@ public class SpawnerRefillingHandler {
 		var pos   = event.getPos();
 		var level = event.getLevel();
 		var block = level.getBlockState(pos).getBlock();
-		if (!(block instanceof SpawnerBlock)) return;
+		if (block != Blocks.SPAWNER) return;
 
 		var heldStack = event.getItemStack();
 		if (!(heldStack.getItem() instanceof SpawnEggItem)) return;

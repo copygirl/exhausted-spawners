@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SpawnerBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,7 +27,7 @@ public class SpawnerHarvestHandler {
 
 	@SubscribeEvent
 	public void onPlayerBreakSpeedEvent(BreakSpeed event) {
-		if (!(event.getState().getBlock() instanceof SpawnerBlock)) return;
+		if (event.getState().getBlock() != Blocks.SPAWNER) return;
 
 		var multiplier = Config.SPAWNER_BREAK_SPEED.get().floatValue();
 		event.setNewSpeed(event.getOriginalSpeed() * multiplier);
@@ -35,7 +35,7 @@ public class SpawnerHarvestHandler {
 
 	@SubscribeEvent
 	public void onBlockBreakEvent(BreakEvent event) {
-		if (!(event.getState().getBlock() instanceof SpawnerBlock)) return;
+		if (event.getState().getBlock() != Blocks.SPAWNER) return;
 
 		var pos   = event.getPos();
 		var level = event.getLevel();
