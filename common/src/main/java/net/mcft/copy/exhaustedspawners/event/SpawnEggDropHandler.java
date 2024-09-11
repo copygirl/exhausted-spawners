@@ -8,6 +8,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.SpawnEggItem;
@@ -37,6 +38,9 @@ public final class SpawnEggDropHandler {
 
 		// Babies don't drop spawn eggs without silk touch.
 		if (!silkTouch && entity.isBaby()) return dropDefaultLoot;
+
+		// Only slimes that are tiny and wouldn't spawn more slimes can drop spawn eggs.
+		if ((entity instanceof Slime) && !((Slime)entity).isTiny()) return dropDefaultLoot;
 
 		var eggDropChance = silkTouch
 			? Config.DROP_CHANCE_SILK_TOUCH.get()
