@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -20,10 +19,10 @@ public class ConfigEnabledCondition implements LootItemCondition {
 	public static final LootItemConditionType TYPE
 		= new LootItemConditionType(new Serializer());
 
-	private final String targetName;
+	private final String path;
 
-	public ConfigEnabledCondition(String targetName) {
-		this.targetName = targetName;
+	public ConfigEnabledCondition(String path) {
+		this.path = path;
 	}
 
 	@Override
@@ -31,13 +30,18 @@ public class ConfigEnabledCondition implements LootItemCondition {
 
 	@Override
 	public boolean test(LootContext ctx) {
-		switch (targetName) {
-			case "silk_touch":                return Config.SPAWNER_SILK_TOUCH.get();
-			case "clear_drops_on_egg":        return Config.CLEAR_DROPS_ON_EGG.get();
-			case "clear_drops_on_silk_touch": return Config.CLEAR_DROPS_ON_SILK_TOUCH.get();
-			default: Constants.LOG.warn(
-					"Unknown name '{}' for LootItemCondition '{}:config_enabled'",
-					targetName, Constants.MOD_ID);
+		switch (path) {
+			case "spawner_loot.silk_touch":
+				return Config.SPAWNER_SILK_TOUCH.get();
+			case "spawn_egg_loot.player_kill_required":
+				return Config.PLAYER_KILL_REQUIRED.get();
+			case "spawn_egg_loot.clear_drops_on_egg":
+				return Config.CLEAR_DROPS_ON_EGG.get();
+			case "spawn_egg_loot.clear_drops_on_silk_touch":
+				return Config.CLEAR_DROPS_ON_SILK_TOUCH.get();
+			default:
+				var message = "Unknown config '{}' for LootItemCondition '{}:config_enabled'";
+				Constants.LOG.warn(message, path, Constants.MOD_ID);
 				return false;
 		}
 	}
@@ -47,12 +51,12 @@ public class ConfigEnabledCondition implements LootItemCondition {
 
 		@Override
 		public void serialize(JsonObject object, ConfigEnabledCondition instance, JsonSerializationContext ctx) {
-			object.addProperty("name", instance.targetName);
+			object.addProperty("path", instance.path);
 		}
 
 		@Override
 		public ConfigEnabledCondition deserialize(JsonObject object, JsonDeserializationContext ctx) {
-			return new ConfigEnabledCondition(GsonHelper.getAsString(object, "name"));
+			return new ConfigEnabledCondition(GsonHelper.getAsString(object, "path"));
 		}
 	}
 }

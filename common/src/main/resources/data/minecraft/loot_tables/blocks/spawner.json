@@ -24,7 +24,7 @@
             },
             {
               "condition": "exhaustedspawners:config_enabled",
-              "name": "silk_touch"
+              "path": "spawner_loot.silk_touch"
             }
           ]
         }
