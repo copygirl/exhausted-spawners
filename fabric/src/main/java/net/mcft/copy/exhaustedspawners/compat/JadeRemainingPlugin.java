@@ -27,7 +27,7 @@ import net.mcft.copy.exhaustedspawners.Config;
 import net.mcft.copy.exhaustedspawners.Constants;
 
 @WailaPlugin
-public class SpawnerRemainingPlugin implements IWailaPlugin {
+public class JadeRemainingPlugin implements IWailaPlugin {
 
 	private static ResourceLocation ID
 		= new ResourceLocation(Constants.MOD_ID, "remaining");
@@ -46,7 +46,7 @@ public class SpawnerRemainingPlugin implements IWailaPlugin {
 		INSTANCE;
 
 		@Override
-		public ResourceLocation getUid() { return SpawnerRemainingPlugin.ID; }
+		public ResourceLocation getUid() { return JadeRemainingPlugin.ID; }
 
 		@Override
 		public void appendServerData(CompoundTag data, BlockAccessor accessor) {

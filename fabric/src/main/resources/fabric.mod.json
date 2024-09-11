@@ -20,7 +20,7 @@
       "net.mcft.copy.exhaustedspawners.ExhaustedSpawners"
     ],
     "jade": [
-      "net.mcft.copy.exhaustedspawners.compat.SpawnerRemainingPlugin"
+      "net.mcft.copy.exhaustedspawners.compat.JadeRemainingPlugin"
     ]
   },
   "mixins": [
