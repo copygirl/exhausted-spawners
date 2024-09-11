@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "exhaustedspawners",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "homepage": "${mod_url}",
+    "sources": "${mod_url}",
+    "issues": "${mod_url}/issues"
+  },
+  "license": "${license}",
+  "icon": "assets/${mod_id}/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.mcft.copy.exhaustedspawners.ExhaustedSpawners"
+    ],
+    "jade": [
+      "net.mcft.copy.exhaustedspawners.compat.SpawnerRemainingPlugin"
+    ]
+  },
+  "mixins": [
+    "exhaustedspawners.mixins.json",
+    "exhaustedspawners.fabric.mixins.json"
+  ],
+  "depends": {
+    "java": ">=17",
+    "minecraft": "1.20.1",
+    "fabricloader": ">=0.14",
+    "fabric": "*",
+    "forgeconfigapiport": ">=8"
+  },
+  "suggests": {
+    "jade": ">=11"
+  }
+}

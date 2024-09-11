@@ -1,123 +1,90 @@
 plugins {
-    id "net.minecraftforge.gradle" version "[6.0,6.2)"
-    id "org.spongepowered.mixin" version "0.7.+"
-    id "maven-publish"
-    id "eclipse"
-    id "idea"
+    id 'fabric-loom' version '1.6-SNAPSHOT' apply(false)
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)' apply(false)
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT' apply(false)
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT' apply(false)
 }
 
-version = minecraft_version + "_" + mod_version
-group = mod_group_id
-base { archivesName = mod_id }
+subprojects {
+    apply plugin: 'java'
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-println "Java: ${System.getProperty "java.version"}, JVM: ${System.getProperty "java.vm.version"} (${System.getProperty "java.vendor"}), Arch: ${System.getProperty "os.arch"}"
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.withSourcesJar()
+    java.withJavadocJar()
 
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        configureEach {
-            workingDirectory project.file("run")
-
-            // Recommended logging data for a userdev environment
-            property "forge.logging.markers", "REGISTRIES"
-
-            // Recommended logging level for the console
-            property "forge.logging.console.level", "debug"
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+    jar {
+        from(rootProject.file("LICENSE.txt")) {
+            rename { "LICENCE_${mod_id}.txt" }
         }
-
-        client {  }
-        server { args "--nogui" }
-        gameTestServer {  }
-    }
-}
-
-repositories {
-    maven { url "https://api.modrinth.com/maven" }
-    flatDir { dir "libs" }
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-
-    implementation fg.deobf("maven.modrinth:jade:${jade_version}+forge")
-}
-
-mixin {
-    add sourceSets.main, "exhaustedspawners.mixins.refmap.json"
-    config "exhaustedspawners.mixins.json"
-
-    debug.verbose = true
-    debug.export = true
-    dumpTargetOnFailure = true
-
-    quiet
-}
-
-// This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-// When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
-// See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-tasks.named("processResources", ProcessResources).configure {
-    var replaceProperties = [
-        loader_version_range: loader_version_range,
-        forge_version_range: forge_version_range,
-        jade_version_range: jade_version_range,
-
-        mod_id: mod_id, mod_name: mod_name, mod_url: mod_url,
-        mod_license: mod_license, mod_version: mod_version,
-        mod_authors: mod_authors, mod_description: mod_description,
-    ]
-    inputs.properties replaceProperties
-
-    filesMatching(["META-INF/mods.toml", "pack.mcmeta"]) {
-        expand replaceProperties + [project: project]
-    }
-}
-
-// Example for how to get properties into the manifest for reading at runtime.
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-            "Specification-Title"     : mod_id,
-            "Specification-Vendor"    : mod_authors,
-            "Specification-Version"   : mod_version,
-            "Implementation-Title"    : project.name,
-            "Implementation-Version"  : project.jar.archiveVersion,
-            "Implementation-Vendor"   : mod_authors,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-
-    // This is the preferred method to reobfuscate your jar file
-    finalizedBy "reobfJar"
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = "UTF-8"
-}
-
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            artifact jar
+        manifest {
+            attributes([
+                'Specification-Title'     : mod_name,
+                'Specification-Vendor'    : mod_author,
+                'Specification-Version'   : project.jar.archiveVersion,
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_author,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Timestamp'               : System.currentTimeMillis(),
+                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                'Built-On-Minecraft'      : minecraft_version
+            ])
         }
     }
+
+    sourcesJar {
+        from(rootProject.file("LICENSE.txt")) {
+            rename { "LICENCE_${mod_id}.txt" }
+        }
+    }
+
     repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
+        mavenCentral()
+        maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url 'https://maven.blamejared.com' }
+        maven { url 'https://api.modrinth.com/maven' }
+        maven { url 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/' }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.getRelease().set(17)
+    }
+
+    processResources {
+        def expandProps = [
+            version: version,
+            group: project.group,
+
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_author: mod_author,
+            mod_url: mod_url,
+            description: project.description,
+            license: license,
+
+            minecraft_version: minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            fabric_version: fabric_version,
+            fabric_loader_version: fabric_loader_version,
+            forge_version: forge_version,
+            forge_version_range: forge_version_range,
+            forge_loader_version_range: forge_loader_version_range,
+
+            forgeconfigapiport_version: forgeconfigapiport_version,
+            jade_version_fabric: jade_version_fabric,
+            jade_version_forge: jade_version_forge,
+            jade_version_range: jade_version_range,
+        ]
+
+        def inFiles = [
+            "pack.mcmeta",
+            "fabric.mod.json",
+            "META-INF/mods.toml",
+            "*.mixins.json",
+        ]
+
+        filesMatching(inFiles) { expand expandProps }
+        inputs.properties(expandProps)
     }
 }

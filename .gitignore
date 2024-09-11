@@ -11,7 +11,8 @@ out
 *.ipr
 *.iws
 *.iml
-.idea
+.idea/*
+!.idea/scopes
 
 # vscode
 .vscode
@@ -22,6 +23,5 @@ build
 
 # other
 eclipse
-libs
 run
-.factorypath
+runs
