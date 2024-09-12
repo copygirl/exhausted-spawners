@@ -33,7 +33,7 @@ public class SpawnerRefillingHandler {
 		if (!(heldStack.getItem() instanceof SpawnEggItem)) return;
 		var eggItem = (SpawnEggItem)heldStack.getItem();
 
-		event.setCanceled(true);
+		// This code only runs on server-side.
 		if (level.isClientSide) return;
 
 		var spawner = Optional.ofNullable(level.getBlockEntity(pos))
@@ -47,11 +47,14 @@ public class SpawnerRefillingHandler {
 		if (player.isCreative()) {
 			// Keep the default behavior of SpawnEggItem, but
 			// also make sure to reset the remaining mob count.
-			event.setCanceled(false);
 			spawner.setLimit(-1);
 		} else if (player.isSpectator()) {
 			// Do nothing if spectator.
 		} else {
+			// Prevent default spawn egg behavior, which is to reset
+			// the monster spawner regardless of currently spawned mob.
+			event.setCanceled(true);
+
 			var remaining = spawner.getRemaining();
 			var isEmpty   = remaining <= 0;
 
