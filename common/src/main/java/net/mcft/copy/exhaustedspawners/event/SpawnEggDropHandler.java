@@ -35,17 +35,17 @@ public final class SpawnEggDropHandler {
 		// If using silk touch and drops are cleared on silk touch, do not drop default loot.
 		var dropDefaultLoot = !(silkTouch && Config.CLEAR_DROPS_ON_SILK_TOUCH.get());
 
+		var eggDropChance = silkTouch
+			? Config.DROP_CHANCE_SILK_TOUCH.get()
+			: Config.DROP_CHANCE.get() + looting * Config.DROP_LOOTING_BONUS.get();
+		if (eggDropChance <= 0) return dropDefaultLoot; // Exit early if drops are disabled.
+
 		// Babies don't drop spawn eggs without silk touch.
 		if (!silkTouch && entity.isBaby()) return dropDefaultLoot;
-
 		// Only slimes that are tiny and wouldn't spawn more slimes can drop spawn eggs.
 		if ((entity instanceof Slime) && !((Slime)entity).isTiny()) return dropDefaultLoot;
 
 		var entityType = entity.getType();
-		var eggDropChance = silkTouch
-			? Config.DROP_CHANCE_SILK_TOUCH.get()
-			: Config.DROP_CHANCE.get() + looting * Config.DROP_LOOTING_BONUS.get();
-
 		// Multiply drop chance depending on 'drop_list' entry (if any).
 		eggDropChance *= lookupDropChanceMultiplier(entityType);
 
