@@ -1,7 +1,7 @@
 modLoader       = "javafml"
 loaderVersion   = "${forge_loader_version_range}"
-license         = "${license}"
 issueTrackerURL = "${mod_url}/issues"
+license         = "${license}"
 
 [[mods]]
   modId       = "${mod_id}"
@@ -9,8 +9,8 @@ issueTrackerURL = "${mod_url}/issues"
   displayName = "${mod_name}"
   displayURL  = "${mod_url}"
   authors     = "${mod_author}"
-  description = '''${description}'''
   logoFile    = "assets/${mod_id}/icon.png"
+  description = '''${description}'''
 
 [[dependencies.${mod_id}]]
   modId        = "minecraft"
