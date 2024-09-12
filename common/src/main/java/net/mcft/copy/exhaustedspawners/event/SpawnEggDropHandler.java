@@ -1,6 +1,5 @@
 package net.mcft.copy.exhaustedspawners.event;
 
-import java.util.Optional;
 import java.util.Map.Entry;
 
 import net.minecraft.world.damagesource.DamageSource;
@@ -40,12 +39,15 @@ public final class SpawnEggDropHandler {
 			: Config.DROP_CHANCE.get() + looting * Config.DROP_LOOTING_BONUS.get();
 		if (eggDropChance <= 0) return dropDefaultLoot; // Exit early if drops are disabled.
 
+		var entityType = entity.getType();
+		var eggItem = SpawnEggItem.byId(entityType);
+		if (eggItem == null) return dropDefaultLoot; // No spawn egg found.
+
 		// Babies don't drop spawn eggs without silk touch.
 		if (!silkTouch && entity.isBaby()) return dropDefaultLoot;
 		// Only slimes that are tiny and wouldn't spawn more slimes can drop spawn eggs.
 		if ((entity instanceof Slime) && !((Slime)entity).isTiny()) return dropDefaultLoot;
 
-		var entityType = entity.getType();
 		// Multiply drop chance depending on 'drop_list' entry (if any).
 		eggDropChance *= lookupDropChanceMultiplier(entityType);
 
@@ -53,7 +55,7 @@ public final class SpawnEggDropHandler {
 		if (entity.getRandom().nextFloat() >= eggDropChance) return dropDefaultLoot;
 
 		// Drop spawn egg where the entity died.
-		Optional.of(entityType).map(SpawnEggItem::byId).ifPresent(entity::spawnAtLocation);
+		entity.spawnAtLocation(eggItem);
 
 		// If drops are cleared when an egg is dropped, do not drop default loot.
 		return dropDefaultLoot && !Config.CLEAR_DROPS_ON_EGG.get();
