@@ -10,7 +10,7 @@ issueTrackerURL = "${mod_url}/issues"
   displayURL  = "${mod_url}"
   authors     = "${mod_author}"
   description = '''${description}'''
-  logoFile    = "icon.png"
+  logoFile    = "assets/${mod_id}/icon.png"
 
 [[dependencies.${mod_id}]]
   modId        = "minecraft"
