@@ -1,11 +1,11 @@
 # Exhausted Spawners
 
-.. is a [Fabric] and [Forge] mod for Minecraft 1.20.1 primarily for limiting the
-number of mobs created by a monster spawner, introducing other ways to recharge
-them, such as by using spawn eggs which drop from slain mobs.
+.. is a [Fabric] and [Forge] mod for Minecraft 1.20.1 for limiting the number
+of mobs created by a monster spawner, introducing other ways to recharge them,
+such as by using spawn eggs which drop from slain mobs.
 
-It's inspired by [Enhanced Mob Spawners], which was the initial inspiration and
-a perfect starting-off point, though no code from the original project remains.
+It's inspired by [Enhanced Mob Spawners], which acted as perfect starting-off
+point to get this mod going, though no code from the original project remains.
 Now based off [MultiLoader-Template] to build for both mod loaders.
 
 ## Features
