@@ -1,10 +1,8 @@
 package net.mcft.copy.exhaustedspawners.event;
 
 import java.util.Optional;
+import java.util.Map.Entry;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +12,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.SpawnEggItem;
 
 import net.mcft.copy.exhaustedspawners.Config;
+import net.mcft.copy.exhaustedspawners.Config.DropListBehavior;
 
 public final class SpawnEggDropHandler {
 	private SpawnEggDropHandler() {  }
@@ -42,30 +41,36 @@ public final class SpawnEggDropHandler {
 		// Only slimes that are tiny and wouldn't spawn more slimes can drop spawn eggs.
 		if ((entity instanceof Slime) && !((Slime)entity).isTiny()) return dropDefaultLoot;
 
+		var entityType = entity.getType();
 		var eggDropChance = silkTouch
 			? Config.DROP_CHANCE_SILK_TOUCH.get()
 			: Config.DROP_CHANCE.get() + looting * Config.DROP_LOOTING_BONUS.get();
 
+		// Multiply drop chance depending on 'drop_list' entry (if any).
+		eggDropChance *= lookupDropChanceMultiplier(entityType);
+
 		// Check if RNGesus is with us this day.
 		if (entity.getRandom().nextFloat() >= eggDropChance) return dropDefaultLoot;
-
-		var entityType = entity.getType();
-		var entityId   = EntityType.getKey(entityType);
-
-		// If entity id is contained in exclude-list, don't drop anything.
-		var excludeList = Config.DROP_EXCLUDE_LIST.get();
-		if (excludeList.contains(entityId.toString())) return dropDefaultLoot;
-
-		// If any of the entity type's tags are contained in the exclude-list, don't drop anything.
-		var excludeTags = excludeList.stream()
-			.filter(s -> s.startsWith("#")).map(s -> s.substring(1))
-			.map(id -> TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(id)));
-		if (excludeTags.anyMatch(entityType::is)) return dropDefaultLoot;
 
 		// Drop spawn egg where the entity died.
 		Optional.of(entityType).map(SpawnEggItem::byId).ifPresent(entity::spawnAtLocation);
 
 		// If drops are cleared when an egg is dropped, do not drop default loot.
 		return dropDefaultLoot && !Config.CLEAR_DROPS_ON_EGG.get();
+	}
+
+	private static double lookupDropChanceMultiplier(EntityType<?> entityType) {
+		var entityId = EntityType.getKey(entityType);
+
+		var id_lookup = Config.CACHED_DROP_LIST_IDS.get(entityId);
+		if (id_lookup != null) return id_lookup;
+
+		var tag_lookup = Config.CACHED_DROP_LIST_TAGS.entrySet().stream()
+			.filter(entry -> entityType.is(entry.getKey()))
+			.map(Entry::getValue).findFirst();
+		if (tag_lookup.isPresent()) return tag_lookup.get();
+
+		// Not found in 'drop_list', use the default depending on 'drop_list_behavior'.
+		return (Config.DROP_LIST_BEHAVIOR.get() == DropListBehavior.ALLOW) ? 0.0 : 1.0;
 	}
 }

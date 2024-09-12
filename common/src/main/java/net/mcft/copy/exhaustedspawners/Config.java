@@ -1,9 +1,14 @@
 package net.mcft.copy.exhaustedspawners;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
 
@@ -39,7 +44,12 @@ public class Config {
 	public static BooleanValue PLAYER_KILL_REQUIRED;
 	public static BooleanValue CLEAR_DROPS_ON_EGG;
 	public static BooleanValue CLEAR_DROPS_ON_SILK_TOUCH;
-	public static ConfigValue<List<String>> DROP_EXCLUDE_LIST;
+	public static ConfigValue<List<String>> DROP_LIST;
+	public static EnumValue<DropListBehavior> DROP_LIST_BEHAVIOR;
+	public enum DropListBehavior { ALLOW, DENY }
+
+	public static Map<ResourceLocation     , Double> CACHED_DROP_LIST_IDS  = ImmutableMap.of();
+	public static Map<TagKey<EntityType<?>>, Double> CACHED_DROP_LIST_TAGS = ImmutableMap.of();
 
 	static {
 		var common = new Builder();
@@ -135,20 +145,79 @@ public class Config {
 				"Whether to always clear mob drops (except equipment) when a Silk Touch item is used.",
 				"Default: true")
 			.define("clear_drops_on_silk_touch", true);
-		DROP_EXCLUDE_LIST = (ConfigValue)common.comment(
-				"List of mobs (ids and tags) that should not drop their spawn eggs when killed.",
-				"Example: [\"minecraft:creeper\", \"minecraft:ghast\", \"#minecraft:illager\"]",
-				"Default: []")
-			.defineList("drop_exclude_list", ImmutableList.of(), Config::isValidIdentifierOrTag);
+		DROP_LIST = (ConfigValue)common.comment(
+				"List of mobs (ids and tags) that are either do or don't drop their spawn eggs.",
+				"By default, all mobs drop spawn eggs depending on the 'drop_list_behavior' setting,",
+				"with entries in this list acting as exceptions. Entries starting with '#' are tags.",
+				"When an entry contains an '=' character, the following number acts as a multiplier to",
+				"the default drop chance, for example '0.5' halfing the chance and '2.0' doubling it.",
+				"Default: [\"minecraft:slime=0.1\", \"minecraft:magma_cube=0.1\", \"#forge:slimes=0.1\", \"#c:slimes=0.1\"]")
+			.defineList("drop_list", ImmutableList.of(
+				"minecraft:slime=0.1",
+				"minecraft:magma_cube=0.1",
+				"#forge:slimes=0.1",
+				"#c:slimes=0.1"
+			), Config::isValidDropListEntry);
+		DROP_LIST_BEHAVIOR = common.comment(
+				"Specifies the behavior of how to treat entries in 'drop_list'.",
+				"In addition, specifies the spawn egg drop behavior for mobs not in the list:",
+				"  ALLOW = Do not drop spawn eggs by default.",
+				"  DENY  = Do drop spawn eggs by default.",
+				"Default: DENY")
+			.defineEnum("drop_list_behavior", DropListBehavior.DENY);
 		common.pop();
 
 		COMMON_CONFIG = common.build();
 	}
 
-	private static boolean isValidIdentifierOrTag(Object obj) {
+	public static void updateCachedValues() {
+		var ids  = ImmutableMap.<ResourceLocation     , Double>builder();
+		var tags = ImmutableMap.<TagKey<EntityType<?>>, Double>builder();
+
+		for (var str : DROP_LIST.get()) {
+			var chance = (DROP_LIST_BEHAVIOR.get() == DropListBehavior.ALLOW) ? 1.0 : 0.0;
+
+			var equalsIndex = str.indexOf('=');
+			if (equalsIndex >= 0) {
+				var chanceStr = str.substring(equalsIndex + 1);
+				str = str.substring(0, equalsIndex);
+				try { chance = Double.parseDouble(chanceStr); }
+				catch (NumberFormatException ex) {  }
+			}
+
+			if (str.startsWith("#")) {
+				str = str.substring(1);
+				var key = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(str));
+				tags.put(key, chance);
+			} else {
+				var key = new ResourceLocation(str);
+				ids.put(key, chance);
+			}
+		}
+
+		CACHED_DROP_LIST_IDS  = ids.build();
+		CACHED_DROP_LIST_TAGS = tags.build();
+	}
+
+	private static boolean isValidDropListEntry(Object obj) {
 		if (!(obj instanceof String)) return false;
 		var str = (String)obj;
+
+		var equalsIndex = str.indexOf('=');
+		if (equalsIndex >= 0) {
+			var chance = Double.NaN;
+			var chanceStr = str.substring(equalsIndex + 1);
+			str = str.substring(0, equalsIndex);
+			// Random rant: Who decided to make parseDouble trim
+			// the input string but parseInt throw an exception?
+			try { chance = Double.parseDouble(chanceStr); }
+			catch (NumberFormatException ex) { return false; }
+			return (chance >= 0) && Double.isFinite(chance);
+		}
+
+		// Strip the '#' from the string if it starts with one.
 		if (str.startsWith("#")) str = str.substring(1);
+
 		return ResourceLocation.isValidResourceLocation(str);
 	}
 }
